@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Seriecentrum - Sverige sydligaste seriebutik i Trelleborg. Serietidningar, seriealbum, Magic the Gathering, PVC figurer och brädspel.">
+    <title>Seriecentrum - Seriebutik i Trelleborg</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <!-- Logo -->
+                <div class="logo-section">
+                    <img src="images/SClogo.png" alt="Seriecentrum Logo" class="logo-image">
+                </div>
+
+                <button class="mobile-menu-toggle" aria-label="Växla meny">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <!-- Navigation -->
+                <nav class="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item has-dropdown">
+                            <a href="#" class="nav-link">Sportkort <span class="chevron">▼</span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" class="dropdown-link">Basebollkort</a></li>
+                                <li><a href="#" class="dropdown-link">Amerikansk Fotboll</a></li>
+                                <li><a href="#" class="dropdown-link">Ishockeykort</a></li>
+                                <li><a href="#" class="dropdown-link">Fotbollskort</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item has-dropdown">
+                            <a href="#" class="nav-link">Samlarkort <span class="chevron">▼</span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" class="dropdown-link">Magic: The Gathering</a></li>
+                                <li><a href="#" class="dropdown-link">Pokemon</a></li>
+                                <li><a href="#" class="dropdown-link">Yu-Gi-Oh</a></li>
+                                <li><a href="#" class="dropdown-link">Andra TCG</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item has-dropdown">
+                            <a href="#" class="nav-link">Serier <span class="chevron">▼</span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" class="dropdown-link">Serier A-Ö</a></li>
+                                <li><a href="#" class="dropdown-link">Serietidningar</a></li>
+                                <li><a href="#" class="dropdown-link">Seriealbum</a></li>
+                                <li><a href="#" class="dropdown-link">Seriepocket</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">PVC Figurer</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">Brädspel</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">Butiken / Bilder</a>
+                        </li>
+                        <li class="nav-item has-dropdown">
+                            <a href="#" class="nav-link">Butik <span class="chevron">▼</span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" class="dropdown-link">Alla Produkter</a></li>
+                                <li><a href="#" class="dropdown-link">Nya Arrangemang</a></li>
+                                <li><a href="#" class="dropdown-link">Erbjudanden</a></li>
+                                <li><a href="#" class="dropdown-link">Sök Produkter</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item has-dropdown">
+                            <a href="#" class="nav-link">Kundservice <span class="chevron">▼</span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" class="dropdown-link">Kontakta Oss</a></li>
+                                <li><a href="#" class="dropdown-link">Vanliga Frågor</a></li>
+                                <li><a href="#" class="dropdown-link">Leveransinfo</a></li>
+                                <li><a href="#" class="dropdown-link">Returpolicy</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Utility Icons -->
+                <div class="utility-icons">
+                    <button class="icon-btn" aria-label="Sök">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" aria-label="Konto">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" aria-label="Varukorg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner Section -->
+    <section class="hero-banner">
+        <div class="hero-carousel">
+            <div class="hero-slide">
+                <img src="images/banner1.jpg" alt="Banner 1" class="hero-image">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-slide">
+                <img src="images/banner2.jpg" alt="Banner 2" class="hero-image">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-slide">
+                <img src="images/banner3.jpg" alt="Banner 3" class="hero-image">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-slide">
+                <img src="images/banner4.webp" alt="Banner 4" class="hero-image">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-slide active">
+                <img src="images/banner5.jpg" alt="Banner 5" class="hero-image">
+                <div class="hero-overlay"></div>
+            </div>
+        </div>
+        
+        <!-- Carousel Indicators -->
+        <div class="carousel-indicators">
+            <button class="indicator" data-slide="0">1</button>
+            <button class="indicator" data-slide="1">2</button>
+            <button class="indicator" data-slide="2">3</button>
+            <button class="indicator" data-slide="3">4</button>
+            <button class="indicator active" data-slide="4">5</button>
+        </div>
+    </section>
+
+    <!-- Catalog Section -->
+    <section class="catalog-section">
+        <div class="catalog-container">
+            <div class="catalog-header">
+                <h2 class="catalog-title">KATALOG</h2>
+                <div class="catalog-description-small">
+                    <p>Vi har ett av Sveriges största lager av serietidningar med tusentals titlar från klassiker till nyutgivningar. Vårt omfattande sortiment täcker allt från populära superhjälteserier till oberoende serier och manga. Oavsett vad du letar efter, finns det garanterat i vårt stora lager!</p>
+                </div>
+            </div>
+
+            <div class="catalog-covers">
+                <div class="cover-item">
+                    <img src="images/Serie1.jpg" alt="Serie 1" class="cover-image">
+                    <div class="cover-info">
+                        <div class="cover-title">The Flash #773</div>
+                        <div class="cover-price">299 kr</div>
+                    </div>
+                </div>
+                <div class="cover-item">
+                    <img src="images/Serie2.jpg" alt="Serie 2" class="cover-image">
+                    <div class="cover-info">
+                        <div class="cover-title">The Chainman #4</div>
+                        <div class="cover-price">159 kr</div>
+                    </div>
+                </div>
+                <div class="cover-item">
+                    <img src="images/Serie3.jpg" alt="Serie 3" class="cover-image">
+                    <div class="cover-info">
+                        <div class="cover-title">The Amazing Spider-Man: Miles Morales #34</div>
+                        <div class="cover-price">259 kr</div>
+                    </div>
+                </div>
+                <div class="cover-item">
+                    <img src="images/Serie4.jpg" alt="Serie 4" class="cover-image">
+                    <div class="cover-info">
+                        <div class="cover-title">The Uncanny X-Men</div>
+                        <div class="cover-price">399 kr</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews-section">
+        <div class="reviews-container">
+            <!-- Customer Reviews -->
+            <div class="review-item">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Fantastiskt utbud av serier och snabb leverans! Bästa serieboken i Skåne."</p>
+                <p class="review-author">Maria K.</p>
+            </div>
+            <div class="review-item">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Perfekt för MTG-samlare. Hittar alltid det jag letar efter här."</p>
+                <p class="review-author">Erik L.</p>
+            </div>
+            <div class="review-item">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Kunnig personal och stort lager. Rekommenderas varmt!"</p>
+                <p class="review-author">Anna S.</p>
+            </div>
+            <div class="review-item">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Bästa butiken för brädspel och serier. Kommer alltid tillbaka!"</p>
+                <p class="review-author">Johan M.</p>
+            </div>
+            <div class="review-item">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Utmärkt service och bra priser. Hittade sällsynta serier jag letat efter länge."</p>
+                <p class="review-author">Peter H.</p>
+            </div>
+            <div class="review-item">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Mycket nöjd med mina köp. Personalen är verkligen kunnig och hjälpsam."</p>
+                <p class="review-author">Lisa N.</p>
+            </div>
+            <div class="review-item">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Stort utbud av PVC-figurer och serier. Min favoritbutik i Trelleborg!"</p>
+                <p class="review-author">Marcus B.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <h2 class="about-title">Om Seriecentrum</h2>
+            <div class="about-content">
+                <p class="about-text">
+                    Seriecentrum är Sveriges sydligaste seriebutik, grundad 1990 i hjärtat av Trelleborg. 
+                    Sedan över 30 år har vi varit en trogen destination för seriefantaster, samlare och 
+                    spelentusiaster i hela Skåne och övriga Sverige.
+                </p>
+                <p class="about-text">
+                    Vår passion för serier, samlarkort och brädspel har gjort oss till en av regionens 
+                    mest respekterade butiker. Vi erbjuder ett omfattande sortiment av serietidningar, 
+                    seriealbum, Magic: The Gathering produkter, PVC-figurer och brädspel för alla åldrar 
+                    och intressen.
+                </p>
+                <p class="about-text">
+                    Hos oss hittar du allt från klassiska serier och nyutgivningar till exklusiva 
+                    samlartidningar och sällsynta kort. Vårt team består av kunniga medarbetare som 
+                    delar din passion och alltid är redo att hjälpa dig hitta precis det du letar efter.
+                </p>
+                <p class="about-text">
+                    Vi tror på att bygga en gemenskap kring våra produkter och arrangerar regelbundet 
+                    events, turneringar och samlaraktiviteter. Besök oss i butiken på Hedvägen 155 i 
+                    Trelleborg eller utforska vårt utbud online.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-title">Besöksadress</h3>
+                    <p class="footer-text">Seriecentrum</p>
+                    <p class="footer-text">Hedvägen 155</p>
+                    <p class="footer-text">231 66, Trelleborg</p>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">Öppettider</h3>
+                    <p class="footer-text">Måndag - Fredag: 10:00 - 18:00</p>
+                    <p class="footer-text">Lördag: 11:00 - 14:00</p>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">Information</h3>
+                    <p class="footer-text">Skicka förfrågningar eller din beställning till något av följande alternativ.</p>
+                    <p class="footer-text">
+                        <strong>Epost:</strong><br>
+                        <a href="mailto:seriecentrum@hotmail.com" class="footer-link">seriecentrum@hotmail.com</a>
+                    </p>
+                    <p class="footer-text">
+                        <em>(Skriv så detaljerat så möjligt och ange i ämnesraden vad saken gäller, t.ex. Förfrågan, Beställning, m.m.)</em>
+                    </p>
+                    <p class="footer-text">
+                        <strong>Telefon:</strong><br>
+                        <a href="tel:041014151" class="footer-link">0410-141 51</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-text">Vi har mer att lägga upp på hemsidan. Har du önskemål om specifika titlar.</p>
+                <p class="footer-copyright">&copy; 2024 Seriecentrum. Alla rättigheter förbehållna.</p>
+                <p class="footer-tagline">Sverige sydligaste seriebutik sedan 1990</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
