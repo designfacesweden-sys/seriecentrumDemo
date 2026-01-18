@@ -78,7 +78,6 @@
     function initMobileMenu() {
         const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
         const mainNav = document.querySelector('.main-nav');
-        const secondaryNav = document.querySelector('.secondary-nav');
         
         if (!mobileMenuToggle) {
             console.warn('Mobile menu toggle button not found');
@@ -98,9 +97,6 @@
         
         console.log('Initializing mobile menu...');
         mobileMenuToggle.setAttribute('data-menu-initialized', 'true');
-        
-        let secondaryNavContent = null;
-        let separator = null;
         
         const closeButton = document.querySelector('.mobile-menu-close');
         
@@ -126,58 +122,6 @@
             const isActive = !mobileMenuToggle.classList.contains('active');
             toggleMenu(isActive);
             console.log('Menu active:', isActive);
-            
-            if (isActive) {
-                // Open menu - move secondary nav content into main nav
-                if (secondaryNav && !secondaryNavContent) {
-                    const secondaryNavList = secondaryNav.querySelector('.secondary-nav-list');
-                    if (secondaryNavList) {
-                        secondaryNavContent = secondaryNavList.cloneNode(true);
-                        const navList = mainNav.querySelector('.nav-list');
-                        if (navList) {
-                            // Create separator
-                            separator = document.createElement('li');
-                            separator.className = 'mobile-menu-separator';
-                            separator.style.width = '100%';
-                            separator.style.height = '2px';
-                            separator.style.background = 'rgba(255, 255, 255, 0.2)';
-                            separator.style.margin = '1rem 0';
-                            separator.style.listStyle = 'none';
-                            navList.appendChild(separator);
-                            
-                            // Append secondary nav items
-                            const secondaryItems = secondaryNavContent.querySelectorAll('.nav-item');
-                            secondaryItems.forEach(item => {
-                                navList.appendChild(item.cloneNode(true));
-                            });
-                            
-                            // Re-initialize dropdowns for new items
-                            setTimeout(() => {
-                                initDropdownMenus();
-                            }, 50);
-                        }
-                    }
-                        }
-                    } else {
-                        // Close menu - restore secondary nav content
-                        if (separator && mainNav.contains(separator)) {
-                            const navList = mainNav.querySelector('.nav-list');
-                            if (navList) {
-                                // Remove separator and all items after it
-                                let current = separator.nextSibling;
-                                while (current) {
-                                    const next = current.nextSibling;
-                                    if (current.classList && current.classList.contains('nav-item')) {
-                                        navList.removeChild(current);
-                                    }
-                                    current = next;
-                                }
-                                navList.removeChild(separator);
-                            }
-                            separator = null;
-                            secondaryNavContent = null;
-                        }
-                    }
         });
         
         // Close button functionality
@@ -186,24 +130,6 @@
                 e.stopPropagation();
                 e.preventDefault();
                 toggleMenu(false);
-                
-                // Clean up secondary nav content
-                if (separator && mainNav.contains(separator)) {
-                    const navList = mainNav.querySelector('.nav-list');
-                    if (navList) {
-                        let current = separator.nextSibling;
-                        while (current) {
-                            const next = current.nextSibling;
-                            if (current.classList && current.classList.contains('nav-item')) {
-                                navList.removeChild(current);
-                            }
-                            current = next;
-                        }
-                        navList.removeChild(separator);
-                    }
-                    separator = null;
-                    secondaryNavContent = null;
-                }
             });
         }
         
@@ -213,47 +139,12 @@
                 if (!mainNav.contains(e.target) && !mobileMenuToggle.contains(e.target) && 
                     (!closeButton || !closeButton.contains(e.target))) {
                     toggleMenu(false);
-                    
-                    // Clean up secondary nav content
-                    if (separator && mainNav.contains(separator)) {
-                        const navList = mainNav.querySelector('.nav-list');
-                        if (navList) {
-                            let current = separator.nextSibling;
-                            while (current) {
-                                const next = current.nextSibling;
-                                if (current.classList && current.classList.contains('nav-item')) {
-                                    navList.removeChild(current);
-                                }
-                                current = next;
-                            }
-                            navList.removeChild(separator);
-                        }
-                        separator = null;
-                        secondaryNavContent = null;
-                    }
                 }
                 
                 // Close menu when clicking on a non-dropdown nav link
                 if (e.target.classList.contains('nav-link') && !e.target.closest('.has-dropdown')) {
                     setTimeout(() => {
                         toggleMenu(false);
-                        
-                        if (separator && mainNav.contains(separator)) {
-                            const navList = mainNav.querySelector('.nav-list');
-                            if (navList) {
-                                let current = separator.nextSibling;
-                                while (current) {
-                                    const next = current.nextSibling;
-                                    if (current.classList && current.classList.contains('nav-item')) {
-                                        navList.removeChild(current);
-                                    }
-                                    current = next;
-                                }
-                                navList.removeChild(separator);
-                            }
-                            separator = null;
-                            secondaryNavContent = null;
-                        }
                     }, 100);
                 }
             }

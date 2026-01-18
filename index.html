@@ -179,6 +179,36 @@
                     .then(response => response.text())
                     .then(html => {
                         footerContainer.innerHTML = html;
+                        
+                        // Adjust image paths in footer
+                        const footerImages = footerContainer.querySelectorAll('img');
+                        footerImages.forEach(img => {
+                            const src = img.getAttribute('src');
+                            if (src && !src.startsWith('http') && !src.startsWith('data:')) {
+                                if (isInPages && src.startsWith('../')) {
+                                    // Already correct for pages/
+                                } else if (!isInPages && src.startsWith('../')) {
+                                    // Remove ../ for root
+                                    img.setAttribute('src', src.replace('../', ''));
+                                }
+                            }
+                        });
+                        
+                        // Adjust link paths in footer
+                        const footerLinks = footerContainer.querySelectorAll('a[href]');
+                        footerLinks.forEach(link => {
+                            const href = link.getAttribute('href');
+                            if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+                                if (isInPages && href.startsWith('pages/')) {
+                                    // Already correct for pages/
+                                } else if (!isInPages && href.startsWith('pages/')) {
+                                    // Keep as is for root
+                                } else if (!isInPages && !href.startsWith('pages/') && !href.startsWith('../')) {
+                                    // Add pages/ prefix for root
+                                    link.setAttribute('href', 'pages/' + href);
+                                }
+                            }
+                        });
                     })
                     .catch(error => {
                         console.error('Error loading footer:', error);

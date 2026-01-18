@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Produktdetaljer - Seriecentrum">
+    <title>Produkt - Seriecentrum</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div id="navbar-container"></div>
+
+    <!-- Product Detail Section -->
+    <section class="page-section product-detail-section">
+        <div class="page-container">
+            <div class="product-detail-container">
+                <div class="product-detail-image">
+                    <div class="product-image-placeholder-large">📦</div>
+                </div>
+                <div class="product-detail-info">
+                    <h1 class="product-detail-title" id="product-title">Produkt</h1>
+                    <div class="product-detail-rating">
+                        <div class="rating-stars">★★★★★</div>
+                        <span class="review-count">(24)</span>
+                    </div>
+                    <div class="product-detail-pricing">
+                        <span class="current-price" id="product-price">299 kr</span>
+                    </div>
+                    <div class="product-detail-condition">
+                        <label for="product-condition">Skick:</label>
+                        <div class="custom-dropdown" id="product-condition-dropdown">
+                            <button class="custom-dropdown-button" type="button" id="product-condition-button">
+                                <span class="dropdown-selected-text">Välj skick</span>
+                                <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <div class="custom-dropdown-menu" id="product-condition-menu">
+                                <div class="dropdown-option" data-value="">Välj skick</div>
+                                <div class="dropdown-option" data-value="mint">Mint</div>
+                                <div class="dropdown-option" data-value="near-mint">Near Mint</div>
+                                <div class="dropdown-option" data-value="excellent">Excellent</div>
+                                <div class="dropdown-option" data-value="very-good">Very Good</div>
+                                <div class="dropdown-option" data-value="good">Good</div>
+                            </div>
+                            <input type="hidden" id="product-condition" name="condition" value="">
+                        </div>
+                    </div>
+                    <div class="product-detail-description">
+                        <p id="product-description">Produktbeskrivning kommer här...</p>
+                    </div>
+                    <div class="product-detail-actions">
+                        <button class="add-to-cart-btn-large" id="add-to-cart-btn" disabled>Lägg i varukorg</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    
+    <script src="../components/navbar.js"></script>
+    <script>
+        // Load footer
+        (function() {
+            const footerContainer = document.getElementById('footer-container');
+            if (footerContainer) {
+                fetch('../components/footer.html')
+                    .then(response => response.text())
+                    .then(html => {
+                        footerContainer.innerHTML = html;
+                        
+                        // Image paths are already correct for pages/ directory (using ../images/)
+                    })
+                    .catch(error => {
+                        console.error('Error loading footer:', error);
+                    });
+            }
+        })();
+
+        // Get product data from URL parameters
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const productName = urlParams.get('name');
+            const productPrice = urlParams.get('price');
+            const productCategory = urlParams.get('category');
+
+            if (productName) {
+                document.getElementById('product-title').textContent = productName;
+                document.title = productName + ' - Seriecentrum';
+            }
+
+            if (productPrice) {
+                document.getElementById('product-price').textContent = productPrice + ' kr';
+            }
+
+            // You can expand this to load more product details from a database or JSON file
+            // For now, we'll use the URL parameters
+        })();
+
+        // Handle custom dropdown
+        (function() {
+            const dropdownButton = document.getElementById('product-condition-button');
+            const dropdownMenu = document.getElementById('product-condition-menu');
+            const dropdownOptions = dropdownMenu.querySelectorAll('.dropdown-option');
+            const hiddenInput = document.getElementById('product-condition');
+            const selectedText = dropdownButton.querySelector('.dropdown-selected-text');
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+
+            // Toggle dropdown
+            dropdownButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('active');
+                dropdownButton.classList.toggle('active');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.remove('active');
+                    dropdownButton.classList.remove('active');
+                }
+            });
+
+            // Handle option selection
+            dropdownOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+                    
+                    hiddenInput.value = value;
+                    selectedText.textContent = text;
+                    
+                    // Update active state
+                    dropdownOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Close dropdown
+                    dropdownMenu.classList.remove('active');
+                    dropdownButton.classList.remove('active');
+                    
+                    // Enable/disable add to cart button
+                    if (value) {
+                        addToCartBtn.disabled = false;
+                    } else {
+                        addToCartBtn.disabled = true;
+                    }
+                });
+            });
+
+            // Handle add to cart
+            addToCartBtn.addEventListener('click', function() {
+                if (!this.disabled && hiddenInput.value) {
+                    const productName = document.getElementById('product-title').textContent;
+                    const productPrice = document.getElementById('product-price').textContent;
+                    const condition = hiddenInput.value;
+                    
+                    if (typeof addToCart === 'function') {
+                        addToCart(productName, condition, productPrice);
+                        alert('Produkten har lagts till i varukorgen!');
+                    } else {
+                        console.log('Add to cart function not available');
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

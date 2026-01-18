@@ -11,213 +11,215 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-        <div id="navbar-container"></div>
+    <div id="navbar-container"></div>
 
-    <section class="page-section">
+    <section class="page-section shop-page">
         <div class="page-container">
             <h1 class="page-title">Butik</h1>
             <p class="page-description">Utforska vårt omfattande utbud av serier, samlarkort, böcker, figurer och brädspel.</p>
             
-            <!-- Category Filter -->
-            <div class="shop-filters">
-                <button class="filter-btn active" data-category="all">Alla</button>
-                <button class="filter-btn" data-category="sportkort">Sportkort</button>
-                <button class="filter-btn" data-category="samlarkort">Samlarkort</button>
-                <button class="filter-btn" data-category="serier">Serier</button>
-                <button class="filter-btn" data-category="bocker">Böcker</button>
-                <button class="filter-btn" data-category="figurer">PVC Figurer</button>
-                <button class="filter-btn" data-category="bradspel">Brädspel</button>
+            <!-- Category Filter and Sort -->
+            <div class="shop-filters-wrapper">
+                <div class="shop-filters">
+                    <button class="filter-btn active" data-category="all">Alla</button>
+                    <button class="filter-btn" data-category="sportkort">Sportkort</button>
+                    <button class="filter-btn" data-category="samlarkort">Samlarkort</button>
+                    <button class="filter-btn" data-category="serier">Serier</button>
+                    <button class="filter-btn" data-category="bocker">Böcker</button>
+                    <button class="filter-btn" data-category="figurer">PVC Figurer</button>
+                    <button class="filter-btn" data-category="bradspel">Brädspel</button>
+                </div>
+                <div class="sort-dropdown-wrapper">
+                    <button class="sort-btn" id="sort-btn" type="button">
+                        <span class="sort-selected-text">Sortera</span>
+                        <svg class="sort-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="sort-dropdown-menu" id="sort-menu">
+                        <div class="sort-option" data-sort="default">Sortera</div>
+                        <div class="sort-option" data-sort="price-low">Lägst pris</div>
+                        <div class="sort-option" data-sort="price-high">Högst pris</div>
+                        <div class="sort-option" data-sort="newest">Nyast</div>
+                        <div class="sort-option" data-sort="popular">Populärast</div>
+                        <div class="sort-option" data-sort="name-asc">Namn A-Ö</div>
+                        <div class="sort-option" data-sort="name-desc">Namn Ö-A</div>
+                    </div>
+                </div>
             </div>
 
             <div class="products-grid" id="products-grid">
-                <div class="product-card" data-category="serier">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>The Flash #773</h3>
-                        <p class="product-price">299 kr</p>
-                        <div class="product-condition">
-                            <label for="condition-1">Skick:</label>
-                            <select id="condition-1" class="condition-select">
-                                <option value="">Välj skick</option>
-                                <option value="mint">Mint</option>
-                                <option value="near-mint">Near Mint</option>
-                                <option value="excellent">Excellent</option>
-                                <option value="very-good">Very Good</option>
-                                <option value="good">Good</option>
-                            </select>
+                <a href="produkt.html?name=The Flash&price=299&category=serier" class="product-card-link">
+                    <div class="product-card" data-category="serier">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
                         </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
+                        <div class="product-card-content">
+                            <h3>The Flash</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">299 kr</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="product-card" data-category="serier">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>The Chainman #4</h3>
-                        <p class="product-price">159 kr</p>
-                        <div class="product-condition">
-                        <label for="condition-2">Skick:</label>
-                        <select id="condition-2" class="condition-select">
-                            <option value="">Välj skick</option>
-                            <option value="mint">Mint</option>
-                            <option value="near-mint">Near Mint</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="very-good">Very Good</option>
-                            <option value="good">Good</option>
-                        </select>
+                </a>
+                <a href="produkt.html?name=The Chainman&price=159&category=serier" class="product-card-link">
+                    <div class="product-card" data-category="serier">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
+                        </div>
+                        <div class="product-card-content">
+                            <h3>The Chainman</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">159 kr</span>
+                            </div>
+                        </div>
                     </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
+                </a>
+                <a href="produkt.html?name=The Amazing Spider-Man&price=259&category=serier" class="product-card-link">
+                    <div class="product-card" data-category="serier">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
+                        </div>
+                        <div class="product-card-content">
+                            <h3>The Amazing Spider-Man</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">259 kr</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="product-card" data-category="serier">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>The Amazing Spider-Man #34</h3>
-                        <p class="product-price">259 kr</p>
-                        <div class="product-condition">
-                        <label for="condition-3">Skick:</label>
-                        <select id="condition-3" class="condition-select">
-                            <option value="">Välj skick</option>
-                            <option value="mint">Mint</option>
-                            <option value="near-mint">Near Mint</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="very-good">Very Good</option>
-                            <option value="good">Good</option>
-                        </select>
+                </a>
+                <a href="produkt.html?name=Magic: The Gathering Booster&price=149&category=samlarkort" class="product-card-link">
+                    <div class="product-card" data-category="samlarkort">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
+                        </div>
+                        <div class="product-card-content">
+                            <h3>Magic: The Gathering Booster</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">149 kr</span>
+                            </div>
+                        </div>
                     </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
+                </a>
+                <a href="produkt.html?name=Basebollkort Set&price=199&category=sportkort" class="product-card-link">
+                    <div class="product-card" data-category="sportkort">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
+                        </div>
+                        <div class="product-card-content">
+                            <h3>Basebollkort Set</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">199 kr</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="product-card" data-category="samlarkort">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>Magic: The Gathering Booster</h3>
-                        <p class="product-price">149 kr</p>
-                        <div class="product-condition">
-                        <label for="condition-4">Skick:</label>
-                        <select id="condition-4" class="condition-select">
-                            <option value="">Välj skick</option>
-                            <option value="mint">Mint</option>
-                            <option value="near-mint">Near Mint</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="very-good">Very Good</option>
-                            <option value="good">Good</option>
-                        </select>
+                </a>
+                <a href="produkt.html?name=PVC Figur - Spider-Man&price=599&category=figurer" class="product-card-link">
+                    <div class="product-card" data-category="figurer">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
+                        </div>
+                        <div class="product-card-content">
+                            <h3>PVC Figur - Spider-Man</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">599 kr</span>
+                            </div>
+                        </div>
                     </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
+                </a>
+                <a href="produkt.html?name=Brädspel - Strategi&price=449&category=bradspel" class="product-card-link">
+                    <div class="product-card" data-category="bradspel">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
+                        </div>
+                        <div class="product-card-content">
+                            <h3>Brädspel - Strategi</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">449 kr</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="product-card" data-category="sportkort">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>Basebollkort Set</h3>
-                        <p class="product-price">199 kr</p>
-                        <div class="product-condition">
-                        <label for="condition-5">Skick:</label>
-                        <select id="condition-5" class="condition-select">
-                            <option value="">Välj skick</option>
-                            <option value="mint">Mint</option>
-                            <option value="near-mint">Near Mint</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="very-good">Very Good</option>
-                            <option value="good">Good</option>
-                        </select>
+                </a>
+                <a href="produkt.html?name=Ungdomsbok - Fantasy&price=249&category=bocker" class="product-card-link">
+                    <div class="product-card" data-category="bocker">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
+                        </div>
+                        <div class="product-card-content">
+                            <h3>Ungdomsbok - Fantasy</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">249 kr</span>
+                            </div>
+                        </div>
                     </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
+                </a>
+                <a href="produkt.html?name=Seriealbum - Klassiker&price=349&category=serier" class="product-card-link">
+                    <div class="product-card" data-category="serier">
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">📦</div>
+                        </div>
+                        <div class="product-card-content">
+                            <h3>Seriealbum - Klassiker</h3>
+                            <div class="product-rating">
+                                <div class="rating-stars">★★★★★</div>
+                                <span class="review-count">(24)</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="current-price">349 kr</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="product-card" data-category="figurer">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>PVC Figur - Spider-Man</h3>
-                        <p class="product-price">599 kr</p>
-                        <div class="product-condition">
-                        <label for="condition-6">Skick:</label>
-                        <select id="condition-6" class="condition-select">
-                            <option value="">Välj skick</option>
-                            <option value="mint">Mint</option>
-                            <option value="near-mint">Near Mint</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="very-good">Very Good</option>
-                            <option value="good">Good</option>
-                        </select>
-                    </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
-                    </div>
-                </div>
-                <div class="product-card" data-category="bradspel">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>Brädspel - Strategi</h3>
-                        <p class="product-price">449 kr</p>
-                        <div class="product-condition">
-                        <label for="condition-7">Skick:</label>
-                        <select id="condition-7" class="condition-select">
-                            <option value="">Välj skick</option>
-                            <option value="mint">Mint</option>
-                            <option value="near-mint">Near Mint</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="very-good">Very Good</option>
-                            <option value="good">Good</option>
-                        </select>
-                    </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
-                    </div>
-                </div>
-                <div class="product-card" data-category="bocker">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>Ungdomsbok - Fantasy</h3>
-                        <p class="product-price">249 kr</p>
-                        <div class="product-condition">
-                        <label for="condition-8">Skick:</label>
-                        <select id="condition-8" class="condition-select">
-                            <option value="">Välj skick</option>
-                            <option value="mint">Mint</option>
-                            <option value="near-mint">Near Mint</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="very-good">Very Good</option>
-                            <option value="good">Good</option>
-                        </select>
-                    </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
-                    </div>
-                </div>
-                <div class="product-card" data-category="serier">
-                    <div class="product-image-placeholder">📦</div>
-                    <div class="product-card-content">
-                        <h3>Seriealbum - Klassiker</h3>
-                        <p class="product-price">349 kr</p>
-                        <div class="product-condition">
-                        <label for="condition-9">Skick:</label>
-                        <select id="condition-9" class="condition-select">
-                            <option value="">Välj skick</option>
-                            <option value="mint">Mint</option>
-                            <option value="near-mint">Near Mint</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="very-good">Very Good</option>
-                            <option value="good">Good</option>
-                        </select>
-                    </div>
-                        <button class="add-to-cart-btn" disabled>Lägg i varukorg</button>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
     </section>
 
-        <div id="footer-container"></div>
-        <script src="../components/navbar.js"></script>
+    <div id="footer-container"></div>
+    
+    <script src="../components/navbar.js"></script>
     <script>
         // Load footer
         (function() {
             const footerContainer = document.getElementById('footer-container');
             if (footerContainer) {
-                const isInPages = window.location.pathname.includes('/pages/');
-                const footerPath = isInPages ? '../components/footer.html' : 'components/footer.html';
-                fetch(footerPath)
+                fetch('../components/footer.html')
                     .then(response => response.text())
                     .then(html => {
                         footerContainer.innerHTML = html;
+                        
+                        // Image paths are already correct for pages/ directory (using ../images/)
                     })
                     .catch(error => {
                         console.error('Error loading footer:', error);
@@ -240,47 +242,128 @@
                     button.classList.add('active');
                     
                     productCards.forEach(card => {
+                        const cardLink = card.closest('.product-card-link');
                         if (category === 'all' || card.getAttribute('data-category') === category) {
-                            card.style.display = 'block';
+                            if (cardLink) {
+                                cardLink.style.display = '';
+                                card.style.display = '';
+                            }
                         } else {
-                            card.style.display = 'none';
+                            if (cardLink) {
+                                cardLink.style.display = 'none';
+                                card.style.display = 'none';
+                            }
                         }
                     });
                 });
             });
 
-            const conditionSelects = document.querySelectorAll('.condition-select');
-            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+            // Sort functionality
+            const sortButton = document.getElementById('sort-btn');
+            const sortMenu = document.getElementById('sort-menu');
+            const sortOptions = sortMenu.querySelectorAll('.sort-option');
+            const sortSelectedText = sortButton.querySelector('.sort-selected-text');
+            const productsGrid = document.getElementById('products-grid');
 
-            conditionSelects.forEach((select, index) => {
-                select.addEventListener('change', () => {
-                    const button = addToCartButtons[index];
-                    if (select.value) {
-                        button.disabled = false;
-                    } else {
-                        button.disabled = true;
-                    }
+            // Toggle sort dropdown
+            sortButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sortMenu.classList.toggle('active');
+                sortButton.classList.toggle('active');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!sortButton.contains(e.target) && !sortMenu.contains(e.target)) {
+                    sortMenu.classList.remove('active');
+                    sortButton.classList.remove('active');
+                }
+            });
+
+            // Handle sort option selection
+            sortOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const sortValue = this.getAttribute('data-sort');
+                    const text = this.textContent;
+                    
+                    sortSelectedText.textContent = text;
+                    
+                    // Update active state
+                    sortOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Close dropdown
+                    sortMenu.classList.remove('active');
+                    sortButton.classList.remove('active');
+                    
+                    // Sort products
+                    sortProducts(sortValue);
                 });
             });
 
-            addToCartButtons.forEach((button, index) => {
-                button.addEventListener('click', () => {
-                    if (!button.disabled) {
-                        const card = button.closest('.product-card');
-                        const productName = card.querySelector('h3').textContent;
-                        const productPrice = card.querySelector('.product-price').textContent;
-                        const condition = card.querySelector('.condition-select').value;
+            function sortProducts(sortType) {
+                if (sortType === 'default') {
+                    // Reset to original order
+                    location.reload();
+                    return;
+                }
+                
+                // Get all product links (both visible and hidden)
+                const allLinks = Array.from(productsGrid.querySelectorAll('.product-card-link'));
+                const visibleLinks = allLinks.filter(link => link.style.display !== 'none');
+                const hiddenLinks = allLinks.filter(link => link.style.display === 'none');
+                
+                // Sort only visible products
+                visibleLinks.sort((a, b) => {
+                    const cardA = a.querySelector('.product-card');
+                    const cardB = b.querySelector('.product-card');
+                    
+                    if (!cardA || !cardB) return 0;
+                    
+                    switch(sortType) {
+                        case 'price-low':
+                            const priceA = parseInt(cardA.querySelector('.current-price')?.textContent.replace(/\D/g, '') || '0');
+                            const priceB = parseInt(cardB.querySelector('.current-price')?.textContent.replace(/\D/g, '') || '0');
+                            return priceA - priceB;
                         
-                        if (typeof addToCart === 'function') {
-                            addToCart(productName, condition, productPrice);
-                            
-                            // Reset condition select
-                            card.querySelector('.condition-select').value = '';
-                            button.disabled = true;
-                        }
+                        case 'price-high':
+                            const priceAHigh = parseInt(cardA.querySelector('.current-price')?.textContent.replace(/\D/g, '') || '0');
+                            const priceBHigh = parseInt(cardB.querySelector('.current-price')?.textContent.replace(/\D/g, '') || '0');
+                            return priceBHigh - priceAHigh;
+                        
+                        case 'name-asc':
+                            const nameA = cardA.querySelector('h3')?.textContent.trim() || '';
+                            const nameB = cardB.querySelector('h3')?.textContent.trim() || '';
+                            return nameA.localeCompare(nameB, 'sv');
+                        
+                        case 'name-desc':
+                            const nameADesc = cardA.querySelector('h3')?.textContent.trim() || '';
+                            const nameBDesc = cardB.querySelector('h3')?.textContent.trim() || '';
+                            return nameBDesc.localeCompare(nameADesc, 'sv');
+                        
+                        case 'newest':
+                            return 0;
+                        
+                        case 'popular':
+                            return 0;
+                        
+                        default:
+                            return 0;
                     }
                 });
-            });
+                
+                // Remove all items from grid
+                allLinks.forEach(link => link.remove());
+                
+                // Re-append sorted visible products first (they will fill the grid properly)
+                visibleLinks.forEach(link => productsGrid.appendChild(link));
+                
+                // Append hidden products at the end (they won't be visible but maintain DOM order)
+                hiddenLinks.forEach(link => {
+                    link.style.display = 'none';
+                    productsGrid.appendChild(link);
+                });
+            }
         });
     </script>
 </body>
