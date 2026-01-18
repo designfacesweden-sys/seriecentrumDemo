@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Vanliga Frågor - Seriecentrum">
+    <title>Vanliga Frågor - Seriecentrum</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+        <div id="navbar-container"></div>
+    <section class="page-section">
+        <div class="page-container">
+            <h1 class="page-title">Vanliga Frågor</h1>
+            <p class="page-description">Svar på vanliga frågor</p>
+                        <div class="info-content">
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <h3 class="faq-question">Hur gör jag en beställning?</h3>
+                        <p class="faq-answer">Du kan beställa via e-post eller telefon. Skicka en detaljerad förfrågan till seriecentrum@hotmail.com eller ring oss på 0410-141 51.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question">Vilka betalningsmetoder accepterar ni?</h3>
+                        <p class="faq-answer">Vi accepterar banköverföring och faktura. Du får betalningsinformation via e-post efter att beställningen är bekräftad.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question">Hur lång leveranstid har ni?</h3>
+                        <p class="faq-answer">Leveranstiden varierar beroende på produkt och lagerstatus. Kontakta oss för mer information om specifika produkter.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question">Kan jag besöka er butik?</h3>
+                        <p class="faq-answer">Ja, vi har öppet måndag-fredag 10:00-18:00 och lördag 11:00-14:00 på Hedvägen 155, 231 66 Trelleborg.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+        <div id="footer-container"></div>
+        <script src="../components/navbar.js"></script>
+    <script>
+        // Load footer
+        (function() {
+            const footerContainer = document.getElementById('footer-container');
+            if (footerContainer) {
+                const isInPages = window.location.pathname.includes('/pages/');
+                const footerPath = isInPages ? '../components/footer.html' : 'components/footer.html';
+                fetch(footerPath)
+                    .then(response => response.text())
+                    .then(html => {
+                        footerContainer.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Error loading footer:', error);
+                    });
+            }
+        })();
+    </script>
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Kassa - Seriecentrum">
+    <title>Kassa - Seriecentrum</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+        <div id="navbar-container"></div>
+
+    <section class="page-section">
+        <div class="page-container">
+            <h1 class="page-title">Kassa</h1>
+            
+            <div class="checkout-layout">
+                <!-- Checkout Form -->
+                <div class="checkout-form-section">
+                    <form id="checkout-form" class="checkout-form">
+                        <!-- Customer Information -->
+                        <div class="form-section">
+                            <h2 class="form-section-title">Kundinformation</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="first-name">Förnamn *</label>
+                                    <input type="text" id="first-name" name="first-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last-name">Efternamn *</label>
+                                    <input type="text" id="last-name" name="last-name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">E-post *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telefon *</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Address -->
+                        <div class="form-section">
+                            <h2 class="form-section-title">Leveransadress</h2>
+                            <div class="form-group">
+                                <label for="address">Adress *</label>
+                                <input type="text" id="address" name="address" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="postal-code">Postnummer *</label>
+                                    <input type="text" id="postal-code" name="postal-code" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="city">Stad *</label>
+                                    <input type="text" id="city" name="city" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Land *</label>
+                                <select id="country" name="country" required>
+                                    <option value="se">Sverige</option>
+                                    <option value="no">Norge</option>
+                                    <option value="dk">Danmark</option>
+                                    <option value="fi">Finland</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="form-section">
+                            <h2 class="form-section-title">Betalningsmetod</h2>
+                            <div class="payment-methods">
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="bank-transfer" checked>
+                                    <span>Banköverföring</span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="invoice">
+                                    <span>Faktura</span>
+                                </label>
+                            </div>
+                            <div class="payment-info">
+                                <p>Du kommer att få betalningsinformation via e-post efter att beställningen är bekräftad.</p>
+                            </div>
+                        </div>
+
+                        <!-- Comments -->
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="comments">Meddelande (valfritt)</label>
+                                <textarea id="comments" name="comments" rows="4" placeholder="Lägg till ett meddelande till din beställning..."></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-order-btn">Slutför beställning</button>
+                    </form>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary-section">
+                    <div class="order-summary-card">
+                        <h2 class="order-summary-title">Ordersammanfattning</h2>
+                        <div class="order-items" id="order-items">
+                            <p class="order-empty">Inga produkter i varukorgen</p>
+                        </div>
+                        <div class="order-summary-footer">
+                            <div class="order-summary-row">
+                                <span>Delsumma</span>
+                                <span id="order-subtotal">0 kr</span>
+                            </div>
+                            <div class="order-summary-row">
+                                <span>Frakt</span>
+                                <span id="order-shipping">Beräknas</span>
+                            </div>
+                            <div class="order-summary-row order-total">
+                                <span>Totalt</span>
+                                <span id="order-total">0 kr</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <div id="footer-container"></div>
+        <script src="../components/navbar.js"></script>
+    <script>
+        // Load footer
+        (function() {
+            const footerContainer = document.getElementById('footer-container');
+            if (footerContainer) {
+                const isInPages = window.location.pathname.includes('/pages/');
+                const footerPath = isInPages ? '../components/footer.html' : 'components/footer.html';
+                fetch(footerPath)
+                    .then(response => response.text())
+                    .then(html => {
+                        footerContainer.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Error loading footer:', error);
+                    });
+            }
+        })();
+    </script>
+    <script src="../script.js"></script>
+    <script>
+        // Update order summary from cart
+        function updateOrderSummary() {
+            // Load cart from localStorage if not already loaded
+            let currentCart = [];
+            if (typeof cart !== 'undefined' && Array.isArray(cart)) {
+                currentCart = cart;
+            } else {
+                try {
+                    const savedCart = localStorage.getItem('seriecentrum_cart');
+                    if (savedCart) {
+                        currentCart = JSON.parse(savedCart);
+                    }
+                } catch (e) {
+                    currentCart = [];
+                }
+            }
+            
+            const orderItems = document.getElementById('order-items');
+            const orderSubtotal = document.getElementById('order-subtotal');
+            const orderTotal = document.getElementById('order-total');
+            
+            if (!currentCart || currentCart.length === 0) {
+                if (orderItems) {
+                    orderItems.innerHTML = '<p class="order-empty">Inga produkter i varukorgen</p>';
+                }
+                if (orderSubtotal) orderSubtotal.textContent = '0 kr';
+                if (orderTotal) orderTotal.textContent = '0 kr';
+                return;
+            }
+            
+            if (orderItems) {
+                orderItems.innerHTML = currentCart.map(item => `
+                    <div class="order-item">
+                        <div class="order-item-info">
+                            <div class="order-item-name">${item.name}</div>
+                            <div class="order-item-details">Skick: ${item.condition}</div>
+                        </div>
+                        <div class="order-item-price">${item.price}</div>
+                    </div>
+                `).join('');
+            }
+            
+            const subtotal = currentCart.reduce((sum, item) => {
+                const price = parseInt(item.price.replace(/\s/g, '').replace('kr', ''));
+                return sum + (isNaN(price) ? 0 : price);
+            }, 0);
+            
+            if (orderSubtotal) orderSubtotal.textContent = `${subtotal} kr`;
+            if (orderTotal) orderTotal.textContent = `${subtotal} kr`;
+        }
+        
+        // Handle form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            updateOrderSummary();
+            
+            const checkoutForm = document.getElementById('checkout-form');
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Check cart from localStorage
+                    let currentCart = [];
+                    try {
+                        const savedCart = localStorage.getItem('seriecentrum_cart');
+                        if (savedCart) {
+                            currentCart = JSON.parse(savedCart);
+                        }
+                    } catch (e) {
+                        currentCart = [];
+                    }
+                    
+                    if (!currentCart || currentCart.length === 0) {
+                        alert('Din varukorg är tom. Lägg till produkter innan du fortsätter.');
+                        window.location.href = 'butik.html';
+                        return;
+                    }
+                    
+                    // Here you would normally send the order to a server
+                    alert('Tack för din beställning! Du kommer att få en bekräftelse via e-post.');
+                    
+                    // Clear cart and redirect
+                    if (typeof cart !== 'undefined') {
+                        cart.length = 0;
+                        if (typeof saveCart === 'function') {
+                            saveCart();
+                        }
+                        if (typeof updateCartDisplay === 'function') {
+                            updateCartDisplay();
+                        }
+                    }
+                    localStorage.removeItem('seriecentrum_cart');
+                    window.location.href = '../index.html';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
