@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="FNM & Turneringar - Seriecentrum">
+    <title>FNM & Turneringar - Seriecentrum</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #000000;
+        }
+        
+        .page-section {
+            padding: 3rem 0;
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9375rem;
+            margin-bottom: 3rem;
+        }
+        
+        .main-layout {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 3rem;
+            align-items: start;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .image-side {
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .image-side img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+        }
+        
+        .content-side {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem 1.5rem;
+        }
+        
+        .info-item {
+            padding: 0;
+        }
+        
+        .info-item h4 {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .info-item .info-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .info-item .info-text p {
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .info-item .info-text p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-item .info-text strong {
+            color: rgba(255, 255, 255, 1);
+            font-weight: 600;
+        }
+        
+        .info-item .info-text a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+        }
+        
+        .info-item .info-text a:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+        
+        .price-display {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fbbf24;
+            margin: 0.25rem 0 0 0;
+        }
+        
+        .text-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .text-section h3 {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0 0 0.875rem 0;
+        }
+        
+        .text-section p {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin: 0 0 0.625rem 0;
+        }
+        
+        .text-section p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .text-section strong {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+        
+        .text-section a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        
+        .text-section a:hover {
+            text-decoration: underline;
+        }
+        
+        .contact-section p {
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .contact-section .contact-name {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .form-wrapper {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+        
+        .form-wrapper h3 {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 1.5rem 0;
+            text-align: center;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 0.9375rem;
+            font-family: inherit;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 0.9375rem 2rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .submit-button:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .image-side {
+                position: static;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+            
+            .info-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <section class="page-section">
+        <div class="page-container">
+            <h1 class="page-title">FNM & Turneringar</h1>
+            <p class="page-subtitle">Magic: The Gathering turneringar och events</p>
+            
+            <div class="main-layout">
+                <!-- Left: Image -->
+                <div class="image-side">
+                    <img src="../images/banner_Lorwyn .jpg" alt="Lorwyn Tournament Banner">
+                </div>
+                
+                <!-- Right: Content -->
+                <div class="content-side">
+                    <!-- Info Grid -->
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <h4>Plats</h4>
+                            <div class="info-text">
+                                <p style="font-weight: 600;">SerieCentrum</p>
+                                <p>Hedvägen 155</p>
+                                <p>231 66 Trelleborg</p>
+                                <p><a href="tel:041014151">0410-141 51</a></p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <h4>När</h4>
+                            <div class="info-text">
+                                <p>Lördag & Söndag</p>
+                                <p style="font-weight: 600;">17:e-18:e Januari 2026</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <h4>Platser</h4>
+                            <div class="info-text">
+                                <p style="font-weight: 600;">24 spelare per/dag</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <h4>Tid</h4>
+                            <div class="info-text">
+                                <p>Klockan <strong>11:00</strong></p>
+                                <p>Registrering: <strong>10:00 - 11:00</strong></p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <h4>Kostnad</h4>
+                            <div class="price-display">395kr</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <h4>Format</h4>
+                            <div class="info-text">
+                                <p>Sealed 6 Boosters</p>
+                                <p>Prerelease Kit</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Förbokning -->
+                    <div class="text-section">
+                        <h3>Förbokning</h3>
+                        <p>För att vara helt säker på plats. Vi brukar inte fylla alla platser.</p>
+                        <p>Gå med i facebook gruppen: <strong>Magic på SerieCentrum</strong></p>
+                    </div>
+                    
+                    <!-- Kontakt -->
+                    <div class="text-section contact-section">
+                        <h3>Kontakt</h3>
+                        <p class="contact-name">Tomas Gjäls</p>
+                        <p><a href="mailto:seriecentrum@hotmail.com">seriecentrum@hotmail.com</a></p>
+                        <p><a href="tel:041014151">0410-141 51</a></p>
+                    </div>
+                    
+                    <!-- Registration Form -->
+                    <div class="form-wrapper">
+                        <h3>Anmäl dig till turneringen</h3>
+                        <form id="tournament-registration-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="first-name">Förnamn *</label>
+                                    <input type="text" id="first-name" name="first-name" required placeholder="Ditt förnamn">
+                                </div>
+                                <div class="form-group">
+                                    <label for="last-name">Efternamn *</label>
+                                    <input type="text" id="last-name" name="last-name" required placeholder="Ditt efternamn">
+                                </div>
+                            </div>
+                            <button type="submit" class="submit-button">Anmäl dig</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-container"></div>
+
+    <script src="../components/navbar.js"></script>
+    <script>
+        // Load footer
+        (function() {
+            const footerContainer = document.getElementById('footer-container');
+            if (footerContainer) {
+                const isInPages = window.location.pathname.includes('/pages/');
+                const footerPath = isInPages ? '../components/footer.html' : 'components/footer.html';
+                fetch(footerPath)
+                    .then(response => response.text())
+                    .then(html => {
+                        footerContainer.innerHTML = html;
+                        
+                        // Adjust image paths in footer
+                        const footerImages = footerContainer.querySelectorAll('img[src]');
+                        footerImages.forEach(img => {
+                            const src = img.getAttribute('src');
+                            if (src && !src.startsWith('http') && !src.startsWith('data:')) {
+                                if (isInPages && !src.startsWith('../')) {
+                                    img.setAttribute('src', '../' + src);
+                                } else if (!isInPages && src.startsWith('../')) {
+                                    img.setAttribute('src', src.replace('../', ''));
+                                }
+                            }
+                        });
+                        
+                        // Adjust link paths in footer
+                        const footerLinks = footerContainer.querySelectorAll('a[href]');
+                        footerLinks.forEach(link => {
+                            const href = link.getAttribute('href');
+                            if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+                                if (isInPages && href.startsWith('pages/')) {
+                                    // Already correct for pages/
+                                } else if (!isInPages && href.startsWith('pages/')) {
+                                    // Keep as is for root
+                                } else if (!isInPages && !href.startsWith('pages/') && !href.startsWith('../')) {
+                                    // Add pages/ prefix for root
+                                    link.setAttribute('href', 'pages/' + href);
+                                }
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading footer:', error);
+                    });
+            }
+        })();
+    </script>
+    <script src="../script.js"></script>
+    <script>
+        // Tournament registration form handler
+        document.getElementById('tournament-registration-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            alert(`Tack ${firstName} ${lastName}! Din anmälan har registrerats. Vi kontaktar dig snart.`);
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>

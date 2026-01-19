@@ -136,37 +136,91 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Handle password copy button (settings page)
-    const copyPasswordBtn = document.getElementById('copy-password-btn');
-    const adminPasswordField = document.getElementById('admin-password');
-    
-    if (copyPasswordBtn && adminPasswordField) {
-        copyPasswordBtn.addEventListener('click', () => {
-            adminPasswordField.select();
-            adminPasswordField.setSelectionRange(0, 99999); // For mobile devices
-            
-            try {
-                navigator.clipboard.writeText(adminPasswordField.value);
-                copyPasswordBtn.textContent = 'Kopierad!';
-                copyPasswordBtn.classList.add('copied');
-                
-                setTimeout(() => {
-                    copyPasswordBtn.textContent = 'Kopiera';
-                    copyPasswordBtn.classList.remove('copied');
-                }, 2000);
-            } catch (err) {
-                // Fallback for older browsers
-                document.execCommand('copy');
-                copyPasswordBtn.textContent = 'Kopierad!';
-                copyPasswordBtn.classList.add('copied');
-                
-                setTimeout(() => {
-                    copyPasswordBtn.textContent = 'Kopiera';
-                    copyPasswordBtn.classList.remove('copied');
-                }, 2000);
+    // Handle toggle password visibility in settings
+    const togglePasswordButtons = document.querySelectorAll('.toggle-password[data-target]');
+    togglePasswordButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            const targetInput = document.getElementById(targetId);
+            if (targetInput) {
+                const type = targetInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                targetInput.setAttribute('type', type);
+                btn.textContent = type === 'password' ? '👁️' : '🙈';
             }
         });
+    });
+
+    // Handle settings form submission
+    const settingsForm = document.getElementById('settings-form');
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('admin-email').value;
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const websiteLock = document.getElementById('website-lock').checked;
+            const lockMessage = document.getElementById('lock-message').value;
+            
+            // Validate password change if any password field is filled
+            if (currentPassword || newPassword || confirmPassword) {
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    alert('Fyll i alla lösenordsfält för att ändra lösenord');
+                    return;
+                }
+                
+                if (currentPassword !== ADMIN_PASSWORD) {
+                    alert('Nuvarande lösenord är felaktigt');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    alert('Nya lösenordet matchar inte bekräftelsen');
+                    return;
+                }
+                
+                if (newPassword.length < 8) {
+                    alert('Nytt lösenord måste vara minst 8 tecken långt');
+                    return;
+                }
+                
+                // Update password (in a real app, this would be sent to a server)
+                ADMIN_PASSWORD = newPassword;
+                alert('Lösenordet har ändrats!');
+                
+                // Clear password fields
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+            }
+            
+            // Save email and lock status (in a real app, this would be sent to a server)
+            localStorage.setItem('adminEmail', email);
+            localStorage.setItem('websiteLocked', websiteLock);
+            localStorage.setItem('lockMessage', lockMessage);
+            
+            alert('Inställningar sparade!');
+        });
     }
+    
+    // Load saved settings
+    if (settingsForm) {
+        const savedEmail = localStorage.getItem('adminEmail');
+        const savedLock = localStorage.getItem('websiteLocked') === 'true';
+        const savedMessage = localStorage.getItem('lockMessage');
+        
+        if (savedEmail) {
+            document.getElementById('admin-email').value = savedEmail;
+        }
+        if (savedLock) {
+            document.getElementById('website-lock').checked = true;
+        }
+        if (savedMessage) {
+            document.getElementById('lock-message').value = savedMessage;
+        }
+    }
+    
 });
 
 // Switch between dashboard sections
@@ -189,7 +243,8 @@ function switchSection(sectionName) {
         'overview': 'Översikt',
         'products': 'Produkter',
         'orders': 'Beställningar',
-        'reviews': 'Recensioner',
+        'about': 'Om oss',
+        'fnm': 'FNM & Turneringar',
         'settings': 'Inställningar'
     };
     

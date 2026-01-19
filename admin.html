@@ -91,17 +91,28 @@
                 </a>
                 <a href="#orders" class="nav-item" data-section="orders">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="9" cy="21" r="1"></circle>
-                        <circle cx="20" cy="21" r="1"></circle>
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
                     </svg>
                     <span>Beställningar</span>
                 </a>
-                <a href="#reviews" class="nav-item" data-section="reviews">
+                <a href="#about" class="nav-item" data-section="about">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 8h.01"></path>
                     </svg>
-                    <span>Recensioner</span>
+                    <span>Om oss</span>
+                </a>
+                <a href="#fnm" class="nav-item" data-section="fnm">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>FNM & Turneringar</span>
                 </a>
                 <a href="#settings" class="nav-item" data-section="settings">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -131,108 +142,107 @@
 
             <!-- Overview Section -->
             <section id="overview-section" class="dashboard-section active">
+                <div class="section-header-modern">
+                    <div class="section-title-wrapper">
+                        <h2>Översikt</h2>
+                        <p class="section-subtitle">Butikens översikt och statistik</p>
+                    </div>
+                </div>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon">📦</div>
                         <div class="stat-content">
-                            <h3>Totalt Produkter</h3>
-                            <p class="stat-number">1,247</p>
-                            <span class="stat-change positive">+12% denna månad</span>
+                            <h3 class="stat-value">1,234</h3>
+                            <p class="stat-label">Totalt produkter</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">🛒</div>
                         <div class="stat-content">
-                            <h3>Beställningar</h3>
-                            <p class="stat-number">342</p>
-                            <span class="stat-change positive">+8% denna månad</span>
+                            <h3 class="stat-value">56</h3>
+                            <p class="stat-label">Beställningar idag</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">💰</div>
                         <div class="stat-content">
-                            <h3>Omsättning</h3>
-                            <p class="stat-number">287,450 kr</p>
-                            <span class="stat-change positive">+15% denna månad</span>
+                            <h3 class="stat-value">45,678 kr</h3>
+                            <p class="stat-label">Omsättning denna månad</p>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">⭐</div>
+                        <div class="stat-icon">📈</div>
                         <div class="stat-content">
-                            <h3>Genomsnittlig Betyg</h3>
-                            <p class="stat-number">4.8</p>
-                            <span class="stat-change">Baserat på 156 recensioner</span>
+                            <h3 class="stat-value">234,567 kr</h3>
+                            <p class="stat-label">Total omsättning</p>
                         </div>
                     </div>
                 </div>
-
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
-                        <h2>Senaste Beställningar</h2>
+                        <h3>Senaste beställningar</h3>
                         <div class="table-container">
                             <table class="data-table">
                                 <thead>
                                     <tr>
                                         <th>Order ID</th>
                                         <th>Kund</th>
-                                        <th>Datum</th>
                                         <th>Belopp</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>#1234</td>
-                                        <td>Maria K.</td>
-                                        <td>2024-01-15</td>
-                                        <td>1,250 kr</td>
-                                        <td><span class="status-badge success">Levererad</span></td>
+                                        <td>#1236</td>
+                                        <td>Maria Svensson</td>
+                                        <td>1,234 kr</td>
+                                        <td><span class="status-badge pending">Väntar</span></td>
                                     </tr>
                                     <tr>
-                                        <td>#1233</td>
-                                        <td>Erik L.</td>
-                                        <td>2024-01-14</td>
-                                        <td>890 kr</td>
-                                        <td><span class="status-badge pending">Pågående</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#1232</td>
-                                        <td>Anna S.</td>
-                                        <td>2024-01-14</td>
-                                        <td>2,100 kr</td>
-                                        <td><span class="status-badge success">Levererad</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#1231</td>
-                                        <td>Johan M.</td>
-                                        <td>2024-01-13</td>
-                                        <td>650 kr</td>
+                                        <td>#1235</td>
+                                        <td>Erik Johansson</td>
+                                        <td>299 kr</td>
                                         <td><span class="status-badge processing">Bearbetas</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#1234</td>
+                                        <td>Anna Andersson</td>
+                                        <td>458 kr</td>
+                                        <td><span class="status-badge success">Levererad</span></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
                     <div class="dashboard-card">
-                        <h2>Snabbstatistik</h2>
-                        <div class="quick-stats">
-                            <div class="quick-stat-item">
-                                <span class="quick-stat-label">Idag</span>
-                                <span class="quick-stat-value">12 beställningar</span>
-                            </div>
-                            <div class="quick-stat-item">
-                                <span class="quick-stat-label">Denna vecka</span>
-                                <span class="quick-stat-value">87 beställningar</span>
-                            </div>
-                            <div class="quick-stat-item">
-                                <span class="quick-stat-label">Denna månad</span>
-                                <span class="quick-stat-value">342 beställningar</span>
-                            </div>
-                            <div class="quick-stat-item">
-                                <span class="quick-stat-label">Lagerstatus</span>
-                                <span class="quick-stat-value">1,247 produkter</span>
-                            </div>
+                        <h3>Populära produkter</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Produkt</th>
+                                        <th>Försäljning</th>
+                                        <th>Lager</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>The Flash #773</td>
+                                        <td>45 st</td>
+                                        <td>15</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Magic: The Gathering Booster</td>
+                                        <td>32 st</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>The Chainman #4</td>
+                                        <td>28 st</td>
+                                        <td>8</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -242,140 +252,106 @@
             <section id="products-section" class="dashboard-section">
                 <div class="section-header-modern">
                     <div class="section-title-wrapper">
-                        <h2>Produkthantering</h2>
-                        <p class="section-subtitle">Hantera och organisera dina produkter</p>
+                        <h2>Produkter</h2>
+                        <p class="section-subtitle">Hantera produkter i butiken</p>
                     </div>
                     <button class="btn-primary-modern">
-                        <span class="btn-icon">+</span>
-                        <span>Lägg till produkt</span>
+                        <span>+ Lägg till produkt</span>
                     </button>
                 </div>
-                
-                <!-- Filters -->
-                <div class="dashboard-card filters-card">
-                    <h3>Filter</h3>
-                    <div class="filters-grid">
-                        <div class="filter-item">
-                            <label>Kategori</label>
-                            <select class="filter-select">
-                                <option>Alla kategorier</option>
-                                <option>Böcker Boktitel A - Ö</option>
-                                <option>Böcker Författare A-Ö</option>
-                                <option>Serier A-Ö</option>
-                                <option>Serietidningar</option>
-                                <option>Seriealbum</option>
-                                <option>Seriepocket</option>
-                                <option>Förlagsnytt</option>
-                                <option>Kompletta Årgångar</option>
-                                <option>Magic the Gathering</option>
-                                <option>PVC Figurer</option>
-                                <option>Brädspel</option>
-                                <option>Skickgraderingar</option>
-                                <option>Butiken / Bilder</option>
-                                <option>Ungdomsböcker</option>
-                                <option>Senaste inlagda</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <label>Skickgradering</label>
-                            <select class="filter-select">
-                                <option>Alla graderingar</option>
-                                <option>Mint</option>
-                                <option>Near Mint</option>
-                                <option>Excellent</option>
-                                <option>Very Good</option>
-                                <option>Good</option>
-                                <option>Fair</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <label>Tillgänglighet</label>
-                            <select class="filter-select">
-                                <option>Alla</option>
-                                <option>Tillgängliga</option>
-                                <option>Slut i lager</option>
-                                <option>Beställningsvara</option>
-                            </select>
-                        </div>
-                        <div class="filter-item">
-                            <label>Sök artikelnummer</label>
-                            <input type="text" class="filter-input" placeholder="Ange artikelnummer...">
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="dashboard-card">
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Artikelnummer</th>
                                     <th>Produkt</th>
                                     <th>Kategori</th>
-                                    <th>Skickgradering</th>
                                     <th>Pris</th>
                                     <th>Lager</th>
-                                    <th>Tillgängliga</th>
                                     <th>Status</th>
                                     <th>Åtgärder</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>SC-001</td>
                                     <td>The Flash #773</td>
-                                    <td>Serietidningar</td>
-                                    <td><span class="grade-badge">Mint</span></td>
+                                    <td>Serier</td>
                                     <td>299 kr</td>
                                     <td>15</td>
-                                    <td><span class="status-badge success">Ja</span></td>
-                                    <td><span class="status-badge success">Aktiv</span></td>
-                                    <td>
-                                        <button class="btn-small">Redigera</button>
-                                        <button class="btn-small btn-danger">Ta bort</button>
-                                    </td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
                                 </tr>
                                 <tr>
-                                    <td>SC-002</td>
-                                    <td>Magic: The Gathering - Booster</td>
-                                    <td>Magic the Gathering</td>
-                                    <td><span class="grade-badge">Near Mint</span></td>
-                                    <td>149 kr</td>
-                                    <td>42</td>
-                                    <td><span class="status-badge success">Ja</span></td>
-                                    <td><span class="status-badge success">Aktiv</span></td>
-                                    <td>
-                                        <button class="btn-small">Redigera</button>
-                                        <button class="btn-small btn-danger">Ta bort</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>SC-003</td>
-                                    <td>PVC Figur - Spider-Man</td>
-                                    <td>PVC Figurer</td>
-                                    <td><span class="grade-badge">Excellent</span></td>
-                                    <td>599 kr</td>
+                                    <td>The Chainman #4</td>
+                                    <td>Serier</td>
+                                    <td>159 kr</td>
                                     <td>8</td>
-                                    <td><span class="status-badge success">Ja</span></td>
-                                    <td><span class="status-badge success">Aktiv</span></td>
-                                    <td>
-                                        <button class="btn-small">Redigera</button>
-                                        <button class="btn-small btn-danger">Ta bort</button>
-                                    </td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
                                 </tr>
                                 <tr>
-                                    <td>SC-004</td>
-                                    <td>The Amazing Spider-Man #34</td>
-                                    <td>Seriealbum</td>
-                                    <td><span class="grade-badge">Very Good</span></td>
-                                    <td>259 kr</td>
+                                    <td>Magic: The Gathering Booster</td>
+                                    <td>Trading Cards</td>
+                                    <td>45 kr</td>
                                     <td>0</td>
-                                    <td><span class="status-badge pending">Nej</span></td>
-                                    <td><span class="status-badge processing">Pausad</span></td>
-                                    <td>
-                                        <button class="btn-small">Redigera</button>
-                                        <button class="btn-small btn-danger">Ta bort</button>
-                                    </td>
+                                    <td><span class="status-badge pending">Slut i lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Pokemon Booster Pack</td>
+                                    <td>Trading Cards</td>
+                                    <td>55 kr</td>
+                                    <td>42</td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Batman #125</td>
+                                    <td>Serier</td>
+                                    <td>189 kr</td>
+                                    <td>23</td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Spider-Man #1</td>
+                                    <td>Serier</td>
+                                    <td>349 kr</td>
+                                    <td>5</td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Yu-Gi-Oh! Booster Box</td>
+                                    <td>Trading Cards</td>
+                                    <td>899 kr</td>
+                                    <td>12</td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>X-Men #1</td>
+                                    <td>Serier</td>
+                                    <td>279 kr</td>
+                                    <td>18</td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>MTG Commander Deck</td>
+                                    <td>Trading Cards</td>
+                                    <td>599 kr</td>
+                                    <td>7</td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Superman #1</td>
+                                    <td>Serier</td>
+                                    <td>399 kr</td>
+                                    <td>3</td>
+                                    <td><span class="status-badge success">I lager</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -388,15 +364,7 @@
                 <div class="section-header-modern">
                     <div class="section-title-wrapper">
                         <h2>Beställningar</h2>
-                        <p class="section-subtitle">Hantera kundbeställningar och leveranser</p>
-                    </div>
-                    <div class="filter-group">
-                        <select class="filter-select">
-                            <option>Alla statusar</option>
-                            <option>Pågående</option>
-                            <option>Levererad</option>
-                            <option>Bearbetas</option>
-                        </select>
+                        <p class="section-subtitle">Hantera kundbeställningar</p>
                     </div>
                 </div>
                 <div class="dashboard-card">
@@ -406,8 +374,8 @@
                                 <tr>
                                     <th>Order ID</th>
                                     <th>Kund</th>
-                                    <th>Produkter</th>
                                     <th>Datum</th>
+                                    <th>Produkter</th>
                                     <th>Belopp</th>
                                     <th>Status</th>
                                     <th>Åtgärder</th>
@@ -415,21 +383,93 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>#1234</td>
-                                    <td>Maria K.</td>
-                                    <td>3 produkter</td>
+                                    <td>#1236</td>
+                                    <td>Maria Svensson</td>
                                     <td>2024-01-15</td>
-                                    <td>1,250 kr</td>
+                                    <td>5 produkter</td>
+                                    <td>1,234 kr</td>
+                                    <td><span class="status-badge pending">Väntar</span></td>
+                                    <td><button class="btn-small">Visa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1235</td>
+                                    <td>Erik Johansson</td>
+                                    <td>2024-01-15</td>
+                                    <td>2 produkter</td>
+                                    <td>299 kr</td>
+                                    <td><span class="status-badge processing">Bearbetas</span></td>
+                                    <td><button class="btn-small">Visa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1234</td>
+                                    <td>Anna Andersson</td>
+                                    <td>2024-01-15</td>
+                                    <td>3 produkter</td>
+                                    <td>458 kr</td>
                                     <td><span class="status-badge success">Levererad</span></td>
                                     <td><button class="btn-small">Visa</button></td>
                                 </tr>
                                 <tr>
                                     <td>#1233</td>
-                                    <td>Erik L.</td>
-                                    <td>2 produkter</td>
+                                    <td>Lars Nilsson</td>
                                     <td>2024-01-14</td>
-                                    <td>890 kr</td>
-                                    <td><span class="status-badge pending">Pågående</span></td>
+                                    <td>1 produkt</td>
+                                    <td>189 kr</td>
+                                    <td><span class="status-badge success">Levererad</span></td>
+                                    <td><button class="btn-small">Visa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1232</td>
+                                    <td>Sara Larsson</td>
+                                    <td>2024-01-14</td>
+                                    <td>4 produkter</td>
+                                    <td>678 kr</td>
+                                    <td><span class="status-badge processing">Bearbetas</span></td>
+                                    <td><button class="btn-small">Visa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1231</td>
+                                    <td>Johan Persson</td>
+                                    <td>2024-01-13</td>
+                                    <td>2 produkter</td>
+                                    <td>349 kr</td>
+                                    <td><span class="status-badge success">Levererad</span></td>
+                                    <td><button class="btn-small">Visa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1230</td>
+                                    <td>Emma Karlsson</td>
+                                    <td>2024-01-13</td>
+                                    <td>6 produkter</td>
+                                    <td>1,567 kr</td>
+                                    <td><span class="status-badge pending">Väntar</span></td>
+                                    <td><button class="btn-small">Visa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1229</td>
+                                    <td>Anders Berg</td>
+                                    <td>2024-01-12</td>
+                                    <td>3 produkter</td>
+                                    <td>445 kr</td>
+                                    <td><span class="status-badge success">Levererad</span></td>
+                                    <td><button class="btn-small">Visa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1228</td>
+                                    <td>Lisa Lindqvist</td>
+                                    <td>2024-01-12</td>
+                                    <td>1 produkt</td>
+                                    <td>599 kr</td>
+                                    <td><span class="status-badge processing">Bearbetas</span></td>
+                                    <td><button class="btn-small">Visa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#1227</td>
+                                    <td>Mikael Holm</td>
+                                    <td>2024-01-11</td>
+                                    <td>8 produkter</td>
+                                    <td>2,134 kr</td>
+                                    <td><span class="status-badge success">Levererad</span></td>
                                     <td><button class="btn-small">Visa</button></td>
                                 </tr>
                             </tbody>
@@ -438,44 +478,96 @@
                 </div>
             </section>
 
-            <!-- Reviews Section -->
-            <section id="reviews-section" class="dashboard-section">
+            <!-- About Section -->
+            <section id="about-section" class="dashboard-section">
                 <div class="section-header-modern">
                     <div class="section-title-wrapper">
-                        <h2>Recensioner</h2>
-                        <p class="section-subtitle">Moderera kundrecensioner</p>
+                        <h2>Om oss</h2>
+                        <p class="section-subtitle">Hantera information om butiken</p>
                     </div>
                 </div>
                 <div class="dashboard-card">
-                    <div class="reviews-list">
-                        <div class="review-item-admin">
-                            <div class="review-header">
-                                <div class="review-author-info">
-                                    <strong>Maria K.</strong>
-                                    <div class="review-stars">★★★★★</div>
-                                </div>
-                                <span class="review-date">2024-01-10</span>
-                            </div>
-                            <p class="review-text">"Fantastiskt utbud av serier och snabb leverans! Bästa serieboken i Skåne."</p>
-                            <div class="review-actions">
-                                <button class="btn-small">Godkänn</button>
-                                <button class="btn-small btn-danger">Avvisa</button>
-                            </div>
+                    <form class="settings-form" id="about-form">
+                        <div class="form-group">
+                            <label for="about-title">Rubrik</label>
+                            <input type="text" id="about-title" name="about-title" class="form-input" placeholder="Om Seriecentrum">
                         </div>
-                        <div class="review-item-admin">
-                            <div class="review-header">
-                                <div class="review-author-info">
-                                    <strong>Erik L.</strong>
-                                    <div class="review-stars">★★★★★</div>
-                                </div>
-                                <span class="review-date">2024-01-08</span>
-                            </div>
-                            <p class="review-text">"Perfekt för MTG-samlare. Hittar alltid det jag letar efter här."</p>
-                            <div class="review-actions">
-                                <button class="btn-small">Godkänn</button>
-                                <button class="btn-small btn-danger">Avvisa</button>
-                            </div>
+                        <div class="form-group">
+                            <label for="about-description">Beskrivning</label>
+                            <textarea id="about-description" name="about-description" class="form-textarea" rows="8" placeholder="Skriv information om butiken här..."></textarea>
                         </div>
+                        <div class="form-group">
+                            <label for="about-address">Adress</label>
+                            <input type="text" id="about-address" name="about-address" class="form-input" placeholder="Butiksadress">
+                        </div>
+                        <div class="form-group">
+                            <label for="about-phone">Telefon</label>
+                            <input type="tel" id="about-phone" name="about-phone" class="form-input" placeholder="Telefonnummer">
+                        </div>
+                        <div class="form-group">
+                            <label for="about-email">E-post</label>
+                            <input type="email" id="about-email" name="about-email" class="form-input" placeholder="E-postadress">
+                        </div>
+                        <button type="submit" class="btn-primary">Spara ändringar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- FNM & Tournaments Section -->
+            <section id="fnm-section" class="dashboard-section">
+                <div class="section-header-modern">
+                    <div class="section-title-wrapper">
+                        <h2>FNM & Turneringar</h2>
+                        <p class="section-subtitle">Hantera FNM och turneringsinformation</p>
+                    </div>
+                    <button class="btn-primary-modern">
+                        <span>+ Lägg till turnering</span>
+                    </button>
+                </div>
+                <div class="dashboard-card">
+                    <div class="form-group">
+                        <label for="fnm-description">FNM Information</label>
+                        <textarea id="fnm-description" name="fnm-description" class="form-textarea" rows="6" placeholder="Skriv information om FNM (Friday Night Magic) här..."></textarea>
+                    </div>
+                    <div class="table-container" style="margin-top: 2rem;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Turnering</th>
+                                    <th>Datum</th>
+                                    <th>Tid</th>
+                                    <th>Format</th>
+                                    <th>Status</th>
+                                    <th>Åtgärder</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>FNM Standard</td>
+                                    <td>2024-01-19</td>
+                                    <td>18:00</td>
+                                    <td>Standard</td>
+                                    <td><span class="status-badge success">Aktiv</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>FNM Draft</td>
+                                    <td>2024-01-26</td>
+                                    <td>18:00</td>
+                                    <td>Draft</td>
+                                    <td><span class="status-badge success">Aktiv</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Turnering Commander</td>
+                                    <td>2024-02-03</td>
+                                    <td>14:00</td>
+                                    <td>Commander</td>
+                                    <td><span class="status-badge pending">Planerad</span></td>
+                                    <td><button class="btn-small">Redigera</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -485,40 +577,63 @@
                 <div class="section-header-modern">
                     <div class="section-title-wrapper">
                         <h2>Inställningar</h2>
-                        <p class="section-subtitle">Hantera butiksinformation och inställningar</p>
+                        <p class="section-subtitle">Hantera e-post, lösenord och webbplatsstatus</p>
                     </div>
                 </div>
                 <div class="dashboard-card">
-                    <h3>Butiksinformation</h3>
-                    <form class="settings-form">
+                    <form class="settings-form" id="settings-form">
                         <div class="form-group">
-                            <label>Butiksnamn</label>
-                            <input type="text" value="Seriecentrum" class="form-input">
+                            <label for="admin-email">E-post</label>
+                            <input type="email" id="admin-email" name="email" value="seriecentrum@hotmail.com" class="form-input" required>
+                            <p class="form-hint">Nuvarande e-postadress för admin-kontot</p>
                         </div>
+
                         <div class="form-group">
-                            <label>Adress</label>
-                            <input type="text" value="Hedvägen 155, 231 66 Trelleborg" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Telefon</label>
-                            <input type="text" value="0410-141 51" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>E-post</label>
-                            <input type="email" value="seriecentrum@hotmail.com" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Öppettider</label>
-                            <textarea class="form-textarea">Måndag - Fredag: 10:00 - 18:00
-Lördag: 11:00 - 14:00</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Admin Lösenord</label>
-                            <div class="password-field-group">
-                                <input type="text" value="ODINALFAF213123" id="admin-password" class="form-input" readonly>
-                                <button type="button" id="copy-password-btn" class="copy-btn">Kopiera</button>
+                            <label>Ändra lösenord</label>
+                            <div class="password-change-group">
+                                <div class="form-group">
+                                    <label for="current-password">Nuvarande lösenord</label>
+                                    <div class="input-wrapper">
+                                        <input type="password" id="current-password" name="current-password" class="form-input" placeholder="Ange nuvarande lösenord">
+                                        <button type="button" class="toggle-password" data-target="current-password" aria-label="Visa/Dölj lösenord">👁️</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-password">Nytt lösenord</label>
+                                    <div class="input-wrapper">
+                                        <input type="password" id="new-password" name="new-password" class="form-input" placeholder="Ange nytt lösenord">
+                                        <button type="button" class="toggle-password" data-target="new-password" aria-label="Visa/Dölj lösenord">👁️</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password">Bekräfta nytt lösenord</label>
+                                    <div class="input-wrapper">
+                                        <input type="password" id="confirm-password" name="confirm-password" class="form-input" placeholder="Bekräfta nytt lösenord">
+                                        <button type="button" class="toggle-password" data-target="confirm-password" aria-label="Visa/Dölj lösenord">👁️</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <span class="toggle-label-text">
+                                    <strong>Lås webbplats</strong>
+                                    <span class="toggle-hint">När webbplatsen är låst kan endast administratörer komma åt den</span>
+                                </span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="website-lock" name="website-lock">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lock-message">Meddelande när webbplatsen är låst</label>
+                            <textarea id="lock-message" name="lock-message" class="form-textarea" placeholder="Webbplatsen är tillfälligt otillgänglig. Vi arbetar på att återställa tjänsten.">Webbplatsen är tillfälligt otillgänglig. Vi arbetar på att återställa tjänsten.</textarea>
+                            <p class="form-hint">Detta meddelande visas för besökare när webbplatsen är låst</p>
+                        </div>
+
                         <button type="submit" class="btn-primary">Spara ändringar</button>
                     </form>
                 </div>
