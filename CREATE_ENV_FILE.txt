@@ -1,0 +1,7 @@
+SKAPA EN FIL SOM HETER ".env" I PROJEKTETS ROTMAPP MED FÖLJANDE INNEHÅLL:
+
+MONGODB_URI=mongodb+srv://designfacesweden_db_user:SIsAb7vrekjNAk3g@seriecentrum.g5xkl5d.mongodb.net/seriecentrum?retryWrites=true&w=majority&appName=SerieCentrum
+PORT=3001
+NODE_ENV=development
+
+VIKTIGT: Filen ska heta exakt ".env" (med punkt framför)

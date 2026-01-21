@@ -1,69 +1,73 @@
-# Seriecentrum - Modern Website
+# Seriecentrum - React Webbshop
 
-A modern, clean, and simplified website for Seriecentrum - Sweden's southernmost comic book store located in Trelleborg.
+Modern React-applikation för Seriecentrum, Sveriges sydligaste seriebutik.
 
-## Overview
+## Teknologi
 
-This is a complete redesign of the Seriecentrum website, focusing on modern design principles, simplicity, and user experience. The new design replaces the cluttered three-column layout with a clean, single-page responsive website.
+- **React 18** - UI-bibliotek
+- **Vite** - Build tool och dev server
+- **React Router** - Navigation och routing
+- **Vanilla CSS** - Styling (behåller originaldesign)
 
-## Features
+## Installation
 
-- **Modern Design**: Clean, minimalist design with ample whitespace
-- **Fully Responsive**: Works seamlessly on desktop, tablet, and mobile devices
-- **Smooth Navigation**: Smooth scrolling and active section highlighting
-- **Mobile-Friendly Menu**: Hamburger menu for mobile devices
-- **Fast Loading**: Lightweight HTML, CSS, and JavaScript
-- **Accessible**: Semantic HTML and proper ARIA labels
+1. Installera dependencies:
+```bash
+npm install
+```
 
-## Structure
+2. Starta utvecklingsserver:
+```bash
+npm run dev
+```
 
-- `index.html` - Main HTML structure
-- `styles.css` - Modern CSS styling with responsive design
-- `script.js` - JavaScript for interactivity (mobile menu, smooth scrolling)
+3. Öppna webbläsaren på `http://localhost:3000`
 
-## Getting Started
+## Build för produktion
 
-Simply open `index.html` in a web browser. No build process or dependencies required.
+```bash
+npm run build
+```
 
-## Navigation Structure
+Byggda filer hamnar i `dist/` mappen.
 
-The navbar is organized into the following categories:
+## Projektstruktur
 
-- **Sports Cards** - Sports-related trading cards (baseball, football, etc.)
-- **Trading Cards** - Trading Card Games (TCGs) including:
-  - Magic: The Gathering (MTG)
-  - Pokemon
-  - Yu-Gi-Oh
-  - Other TCGs
-- **Serier** - Comic books and graphic novels including:
-  - Serier A-Ö (Comics A-Z)
-  - Serietidningar (Comic magazines)
-  - Seriealbum (Comic albums)
-  - Seriepocket (Comic pockets)
-- **PVC Figurer** - Action figures and collectibles
-- **Brädspel** - Board games
-- **Butiken / Bilder** - Store information and photos
-- **Shop** - General shopping categories
-- **Support** - Customer support and help
+```
+seriecentrumDemo/
+├── public/
+│   ├── images/          # Alla bilder
+│   └── products.json    # Produktdata
+├── src/
+│   ├── components/      # React-komponenter
+│   │   ├── Navbar.jsx
+│   │   └── Footer.jsx
+│   ├── pages/          # Sidor
+│   │   ├── Home.jsx
+│   │   ├── Shop.jsx
+│   │   ├── Product.jsx
+│   │   ├── Contact.jsx
+│   │   └── FAQ.jsx
+│   ├── context/        # React Context
+│   │   └── CartContext.jsx
+│   ├── App.jsx         # Huvudapplikation
+│   ├── main.jsx        # Entry point
+│   └── styles.css      # Globala styles
+├── package.json
+└── vite.config.js
+```
 
-## Sections
+## Funktioner
 
-1. **Hero Section** - Welcome message and call-to-action buttons
-2. **Products** - Showcase of product categories (comics, Magic the Gathering, board games, etc.)
-3. **About** - Information about the store since 1990
-4. **Contact** - Store address, phone, hours, and social media links
+- ✅ Produktkatalog med sök och filter
+- ✅ Produktdetaljsida
+- ✅ Varukorg (localStorage)
+- ✅ Responsiv design (desktop & mobil)
+- ✅ React Router navigation
+- ✅ Hero carousel på startsidan
 
-## Technologies
+## Noteringar
 
-- HTML5
-- CSS3 (with CSS Variables)
-- Vanilla JavaScript
-- Google Fonts (Inter)
-
-## Browser Support
-
-Works on all modern browsers (Chrome, Firefox, Safari, Edge).
-
-## License
-
-All rights reserved - Seriecentrum
+- Alla scraping-relaterade Python-filer har tagits bort
+- Gamla HTML/JS-filer har tagits bort
+- `products.json` och `images/` behålls för produktdata

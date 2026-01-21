@@ -60,6 +60,7 @@
                 setTimeout(() => {
                     initMobileMenu();
                     initDropdownMenus();
+                    initCartDropdown();
                 }, 50);
                 
                 // Update cart display after navbar loads
@@ -102,15 +103,24 @@
         
         function toggleMenu(isActive) {
             if (isActive) {
+                // Remove closing class if it exists
+                mainNav.classList.remove('closing');
                 mobileMenuToggle.classList.add('active');
                 mainNav.classList.add('active');
                 if (closeButton) closeButton.classList.add('active');
                 document.body.classList.add('menu-open');
             } else {
-                mobileMenuToggle.classList.remove('active');
-                mainNav.classList.remove('active');
-                if (closeButton) closeButton.classList.remove('active');
-                document.body.classList.remove('menu-open');
+                // Add closing class to trigger fade-out animation
+                mainNav.classList.add('closing');
+                
+                // Wait for fade-out animation to complete before removing active class
+                setTimeout(() => {
+                    mobileMenuToggle.classList.remove('active');
+                    mainNav.classList.remove('active');
+                    mainNav.classList.remove('closing');
+                    if (closeButton) closeButton.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                }, 300); // Match the CSS transition duration (0.3s = 300ms)
             }
         }
         
@@ -118,10 +128,8 @@
             e.stopPropagation();
             e.preventDefault();
             
-            console.log('Mobile menu toggle clicked');
             const isActive = !mobileMenuToggle.classList.contains('active');
             toggleMenu(isActive);
-            console.log('Menu active:', isActive);
         });
         
         // Close button functionality
@@ -143,12 +151,113 @@
                 
                 // Close menu when clicking on a non-dropdown nav link
                 if (e.target.classList.contains('nav-link') && !e.target.closest('.has-dropdown')) {
-                    setTimeout(() => {
-                        toggleMenu(false);
-                    }, 100);
+                    toggleMenu(false);
                 }
             }
         });
+    }
+    
+    // Initialize cart dropdown
+    function initCartDropdown() {
+        const cartToggle = document.getElementById('cart-toggle');
+        const cartWrapper = document.querySelector('.cart-wrapper');
+        const cartDropdown = document.getElementById('cart-dropdown');
+        
+        if (cartToggle && cartWrapper && cartDropdown) {
+            cartToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                const isActive = cartWrapper.classList.contains('active');
+                const isMobile = window.innerWidth <= 768;
+                
+                cartWrapper.classList.toggle('active');
+                
+                // Mobile: full screen slide-in
+                if (isMobile && cartWrapper.classList.contains('active')) {
+                    cartDropdown.style.position = 'fixed';
+                    cartDropdown.style.top = '0';
+                    cartDropdown.style.left = '0';
+                    cartDropdown.style.right = '0';
+                    cartDropdown.style.bottom = '0';
+                    cartDropdown.style.width = '100vw';
+                    cartDropdown.style.maxWidth = '100vw';
+                    cartDropdown.style.maxHeight = '100vh';
+                    cartDropdown.style.height = '100vh';
+                    cartDropdown.style.zIndex = '100002';
+                    cartDropdown.style.transform = 'translateX(0)';
+                    document.body.classList.add('cart-open');
+                } else if (isMobile) {
+                    // Reset mobile styles when closing
+                    cartDropdown.style.position = '';
+                    cartDropdown.style.top = '';
+                    cartDropdown.style.bottom = '';
+                    cartDropdown.style.left = '';
+                    cartDropdown.style.right = '';
+                    cartDropdown.style.width = '';
+                    cartDropdown.style.maxWidth = '';
+                    cartDropdown.style.maxHeight = '';
+                    cartDropdown.style.height = '';
+                    cartDropdown.style.zIndex = '';
+                    cartDropdown.style.transform = '';
+                    document.body.classList.remove('cart-open');
+                }
+            });
+            
+            // Close cart button
+            const cartCloseBtn = document.getElementById('cart-close-btn');
+            if (cartCloseBtn) {
+                cartCloseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    cartWrapper.classList.remove('active');
+                    if (window.innerWidth <= 768) {
+                        document.body.classList.remove('cart-open');
+                    }
+                });
+            }
+            
+            // Close cart when clicking outside (desktop only)
+            document.addEventListener('click', (e) => {
+                const isMobile = window.innerWidth <= 768;
+                if (!isMobile && !cartWrapper.contains(e.target)) {
+                    cartWrapper.classList.remove('active');
+                }
+            });
+            
+            // Update position on resize (mobile only)
+            window.addEventListener('resize', () => {
+                if (cartWrapper.classList.contains('active')) {
+                    const isMobile = window.innerWidth <= 768;
+                    if (isMobile) {
+                        cartDropdown.style.position = 'fixed';
+                        cartDropdown.style.top = '0';
+                        cartDropdown.style.left = '0';
+                        cartDropdown.style.right = '0';
+                        cartDropdown.style.bottom = '0';
+                        cartDropdown.style.width = '100vw';
+                        cartDropdown.style.maxWidth = '100vw';
+                        cartDropdown.style.maxHeight = '100vh';
+                        cartDropdown.style.height = '100vh';
+                        cartDropdown.style.zIndex = '100002';
+                        cartDropdown.style.transform = 'translateX(0)';
+                    } else {
+                        // Desktop: reset to use CSS
+                        cartDropdown.style.position = '';
+                        cartDropdown.style.top = '';
+                        cartDropdown.style.bottom = '';
+                        cartDropdown.style.left = '';
+                        cartDropdown.style.right = '';
+                        cartDropdown.style.width = '';
+                        cartDropdown.style.maxWidth = '';
+                        cartDropdown.style.maxHeight = '';
+                        cartDropdown.style.height = '';
+                        cartDropdown.style.zIndex = '';
+                        cartDropdown.style.transform = '';
+                        document.body.classList.remove('cart-open');
+                    }
+                }
+            });
+        }
     }
     
     // Initialize dropdown menus

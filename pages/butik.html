@@ -11,204 +11,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Header -->
     <div id="navbar-container"></div>
 
-    <section class="page-section shop-page">
+    <!-- Shop Section -->
+    <section class="page-section">
         <div class="page-container">
-            <h1 class="page-title">Butik</h1>
-            <p class="page-description">Utforska vårt omfattande utbud av serier, samlarkort, böcker, figurer och brädspel.</p>
-            
-            <!-- Category Filter and Sort -->
-            <div class="shop-filters-wrapper">
-                <div class="shop-filters">
-                    <button class="filter-btn active" data-category="all">Alla</button>
-                    <button class="filter-btn" data-category="sportkort">Sportkort</button>
-                    <button class="filter-btn" data-category="samlarkort">Samlarkort</button>
-                    <button class="filter-btn" data-category="serier">Serier</button>
-                    <button class="filter-btn" data-category="bocker">Böcker</button>
-                    <button class="filter-btn" data-category="figurer">PVC Figurer</button>
-                    <button class="filter-btn" data-category="bradspel">Brädspel</button>
+            <div class="page-header">
+                <h1 class="page-title">Butik</h1>
+                <p class="page-description">Utforska vårt stora utbud av produkter</p>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="shop-controls">
+                <div class="search-container">
+                    <input type="text" id="search-input" class="search-input" placeholder="Sök produkter...">
                 </div>
-                <div class="sort-dropdown-wrapper">
-                    <button class="sort-btn" id="sort-btn" type="button">
-                        <span class="sort-selected-text">Sortera</span>
-                        <svg class="sort-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    <div class="sort-dropdown-menu" id="sort-menu">
-                        <div class="sort-option" data-sort="default">Sortera</div>
-                        <div class="sort-option" data-sort="price-low">Lägst pris</div>
-                        <div class="sort-option" data-sort="price-high">Högst pris</div>
-                        <div class="sort-option" data-sort="newest">Nyast</div>
-                        <div class="sort-option" data-sort="popular">Populärast</div>
-                        <div class="sort-option" data-sort="name-asc">Namn A-Ö</div>
-                        <div class="sort-option" data-sort="name-desc">Namn Ö-A</div>
+                <div class="filter-container">
+                    <div class="category-dropdown-wrapper">
+                        <button type="button" class="category-btn" id="category-btn">
+                            <span class="category-selected-text">Alla kategorier</span>
+                            <svg class="category-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="category-dropdown-menu" id="category-menu">
+                            <div class="category-option" data-value="all">Alla kategorier</div>
+                            <div class="category-option" data-value="serier">Serier</div>
+                            <div class="category-option" data-value="bocker">Böcker</div>
+                            <div class="category-option" data-value="samlarkort">Samlarkort</div>
+                            <div class="category-option" data-value="figurer">Figurer</div>
+                            <div class="category-option" data-value="bradspel">Brädspel</div>
+                            <div class="category-option" data-value="sportkort">Sportkort</div>
+                        </div>
+                        <select id="category-filter" style="display: none;">
+                            <option value="all">Alla kategorier</option>
+                            <option value="serier">Serier</option>
+                            <option value="bocker">Böcker</option>
+                            <option value="samlarkort">Samlarkort</option>
+                            <option value="figurer">Figurer</option>
+                            <option value="bradspel">Brädspel</option>
+                            <option value="sportkort">Sportkort</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="sort-container">
+                    <div class="sort-dropdown-wrapper">
+                        <button type="button" class="sort-btn" id="sort-btn">
+                            <span class="sort-selected-text">Namn A-Z</span>
+                            <svg class="sort-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="sort-dropdown-menu" id="sort-menu">
+                            <div class="sort-option" data-value="name-asc">Namn A-Z</div>
+                            <div class="sort-option" data-value="name-desc">Namn Z-A</div>
+                            <div class="sort-option" data-value="price-asc">Pris Lågt-Högt</div>
+                            <div class="sort-option" data-value="price-desc">Pris Högt-Lågt</div>
+                        </div>
+                        <select id="sort-select" style="display: none;">
+                            <option value="name-asc">Namn A-Z</option>
+                            <option value="name-desc">Namn Z-A</option>
+                            <option value="price-asc">Pris Lågt-Högt</option>
+                            <option value="price-desc">Pris Högt-Lågt</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
+            <!-- Products Grid -->
             <div class="products-grid" id="products-grid">
-                <a href="produkt.html?name=The Flash&price=299&category=serier" class="product-card-link">
-                    <div class="product-card" data-category="serier">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>The Flash</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">299 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a href="produkt.html?name=The Chainman&price=159&category=serier" class="product-card-link">
-                    <div class="product-card" data-category="serier">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>The Chainman</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">159 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a href="produkt.html?name=The Amazing Spider-Man&price=259&category=serier" class="product-card-link">
-                    <div class="product-card" data-category="serier">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>The Amazing Spider-Man</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">259 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a href="produkt.html?name=Magic: The Gathering Booster&price=149&category=samlarkort" class="product-card-link">
-                    <div class="product-card" data-category="samlarkort">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>Magic: The Gathering Booster</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">149 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a href="produkt.html?name=Basebollkort Set&price=199&category=sportkort" class="product-card-link">
-                    <div class="product-card" data-category="sportkort">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>Basebollkort Set</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">199 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a href="produkt.html?name=PVC Figur - Spider-Man&price=599&category=figurer" class="product-card-link">
-                    <div class="product-card" data-category="figurer">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>PVC Figur - Spider-Man</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">599 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a href="produkt.html?name=Brädspel - Strategi&price=449&category=bradspel" class="product-card-link">
-                    <div class="product-card" data-category="bradspel">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>Brädspel - Strategi</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">449 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a href="produkt.html?name=Ungdomsbok - Fantasy&price=249&category=bocker" class="product-card-link">
-                    <div class="product-card" data-category="bocker">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>Ungdomsbok - Fantasy</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">249 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a href="produkt.html?name=Seriealbum - Klassiker&price=349&category=serier" class="product-card-link">
-                    <div class="product-card" data-category="serier">
-                        <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">📦</div>
-                        </div>
-                        <div class="product-card-content">
-                            <h3>Seriealbum - Klassiker</h3>
-                            <div class="product-rating">
-                                <div class="rating-stars">★★★★★</div>
-                                <span class="review-count">(24)</span>
-                            </div>
-                            <div class="product-pricing">
-                                <span class="current-price">349 kr</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
+                <!-- Products loaded dynamically from products.json via JavaScript -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" id="pagination-container">
+                <!-- Pagination will be generated by JavaScript -->
             </div>
         </div>
     </section>
 
+    <!-- Footer -->
     <div id="footer-container"></div>
     
     <script src="../components/navbar.js"></script>
+    <script src="../script.js"></script>
     <script>
         // Load footer
         (function() {
@@ -218,152 +105,363 @@
                     .then(response => response.text())
                     .then(html => {
                         footerContainer.innerHTML = html;
-                        
-                        // Image paths are already correct for pages/ directory (using ../images/)
                     })
                     .catch(error => {
                         console.error('Error loading footer:', error);
                     });
             }
         })();
-    </script>
-    <script src="../script.js"></script>
-    <script>
-        // Filter functionality
-        document.addEventListener('DOMContentLoaded', () => {
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            const productCards = document.querySelectorAll('.product-card');
 
-            filterButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const category = button.getAttribute('data-category');
+        // Products per page - 6x8 grid on desktop (48), 4x8 grid on mobile (32)
+        const productsPerPage = window.innerWidth <= 768 ? 32 : 48;
+
+        // Get all product cards
+        let productCards = Array.from(document.querySelectorAll('.product-card-link'));
+
+        // Filter and search functionality
+        let isFiltering = false;
+        function getProductsPerPage() {
+            return window.innerWidth <= 768 ? 32 : 48;
+        }
+        
+        function filterAndSearch() {
+            if (isFiltering) return;
+            isFiltering = true;
+
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+            const productsGrid = document.getElementById('products-grid');
+            
+            // Get current page from URL or default to 1
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPage = parseInt(urlParams.get('page')) || 1;
+            const currentProductsPerPage = getProductsPerPage();
+
+            // Filter products
+            let visibleCount = 0;
+            productCards.forEach(card => {
+                const productCard = card.querySelector('.product-card');
+                const category = productCard ? productCard.getAttribute('data-category') : '';
+                const productName = card.querySelector('h3') ? card.querySelector('h3').textContent.toLowerCase() : '';
+                
+                const matchesSearch = !searchTerm || productName.includes(searchTerm);
+                const matchesCategory = categoryFilter === 'all' || category === categoryFilter;
+                
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'block';
+                    card.style.visibility = 'visible';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                    card.style.visibility = 'hidden';
+                }
+            });
+
+            // Get visible products
+            const visibleProducts = productCards.filter(card => 
+                card.style.display !== 'none' && card.style.visibility !== 'hidden'
+            );
+
+            // Calculate pagination
+            const totalPages = Math.ceil(visibleProducts.length / currentProductsPerPage);
+            const startIndex = (currentPage - 1) * currentProductsPerPage;
+            const endIndex = startIndex + currentProductsPerPage;
+            const productsToShow = visibleProducts.slice(startIndex, endIndex);
+
+            // Hide all products first
+            productCards.forEach(card => {
+                card.style.display = 'none';
+                card.style.visibility = 'hidden';
+            });
+
+            // Show only products for current page
+            productsToShow.forEach(card => {
+                card.style.display = 'block';
+                card.style.visibility = 'visible';
+            });
+
+            // Update pagination
+            updatePagination(totalPages, currentPage);
+
+            setTimeout(() => {
+                isFiltering = false;
+            }, 0);
+        }
+
+        // Sort products
+        function sortProducts() {
+            const sortValue = document.getElementById('sort-select').value;
+            const productsGrid = document.getElementById('products-grid');
+            
+            // Get visible products
+            const visibleProducts = Array.from(productCards).filter(card => 
+                card.style.display !== 'none'
+            );
+
+            // Sort products
+            visibleProducts.sort((a, b) => {
+                const nameA = a.querySelector('h3') ? a.querySelector('h3').textContent.trim() : '';
+                const nameB = b.querySelector('h3') ? b.querySelector('h3').textContent.trim() : '';
+                const priceA = a.querySelector('.current-price') ? 
+                    parseInt(a.querySelector('.current-price').textContent.replace(/[^\d]/g, '')) || 0 : 0;
+                const priceB = b.querySelector('.current-price') ? 
+                    parseInt(b.querySelector('.current-price').textContent.replace(/[^\d]/g, '')) || 0 : 0;
+
+                switch(sortValue) {
+                    case 'name-asc':
+                        return nameA.localeCompare(nameB, 'sv');
+                    case 'name-desc':
+                        return nameB.localeCompare(nameA, 'sv');
+                    case 'price-asc':
+                        return priceA - priceB;
+                    case 'price-desc':
+                        return priceB - priceA;
+                    default:
+                        return 0;
+                }
+            });
+
+            // Reorder DOM elements using DocumentFragment
+            const fragment = document.createDocumentFragment();
+            const allLinks = Array.from(productsGrid.querySelectorAll('.product-card-link'));
+            
+            // Add sorted visible products first
+            visibleProducts.forEach(card => {
+                if (allLinks.includes(card)) {
+                    fragment.appendChild(card);
+                    allLinks.splice(allLinks.indexOf(card), 1);
+                }
+            });
+            
+            // Add remaining (hidden) products
+            allLinks.forEach(card => {
+                fragment.appendChild(card);
+            });
+
+            // Clear and repopulate grid
+            while (productsGrid.firstChild) {
+                productsGrid.removeChild(productsGrid.firstChild);
+            }
+            productsGrid.appendChild(fragment);
+
+            // Update productCards reference
+            productCards = Array.from(document.querySelectorAll('.product-card-link'));
+            
+            // Reapply filter to maintain visibility state
+            filterAndSearch();
+        }
+
+        // Update pagination
+        function updatePagination(totalPages, currentPage) {
+            const paginationContainer = document.getElementById('pagination-container');
+            if (!paginationContainer) return;
+
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            // Calculate products per page display (6x8 grid = 48 on desktop, 4x8 = 32 on mobile)
+            const productsPerPageDisplay = getProductsPerPage();
+            let paginationHTML = '<div class="pagination-info">' + productsPerPageDisplay + 'Kr</div><div class="pagination">';
+            
+            // Previous button
+            if (currentPage > 1) {
+                const prevPage = currentPage - 1;
+                paginationHTML += `<a href="?page=${prevPage}" class="pagination-link">‹ Föregående</a>`;
+            } else {
+                paginationHTML += '<span class="pagination-link disabled">‹ Föregående</span>';
+            }
+
+            // Page numbers
+            const maxVisiblePages = 10;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            if (startPage > 1) {
+                paginationHTML += `<a href="?page=1" class="pagination-link">1</a>`;
+                if (startPage > 2) {
+                    paginationHTML += '<span class="pagination-ellipsis">...</span>';
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    paginationHTML += `<span class="pagination-link active">${i}</span>`;
+                } else {
+                    paginationHTML += `<a href="?page=${i}" class="pagination-link">${i}</a>`;
+                }
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += '<span class="pagination-ellipsis">...</span>';
+                }
+                paginationHTML += `<a href="?page=${totalPages}" class="pagination-link">${totalPages}</a>`;
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                const nextPage = currentPage + 1;
+                paginationHTML += `<a href="?page=${nextPage}" class="pagination-link">Nästa ›</a>`;
+            } else {
+                paginationHTML += '<span class="pagination-link disabled">Nästa ›</span>';
+            }
+
+            paginationHTML += '</div>';
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        // Load products from JSON and render them
+        function loadProductsFromJSON() {
+            const productsGrid = document.getElementById('products-grid');
+            if (!productsGrid) return;
+
+            fetch('../products.json')
+                .then(response => response.json())
+                .then(products => {
+                    console.log(`Loading ${products.length} products...`);
                     
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    
-                    productCards.forEach(card => {
-                        const cardLink = card.closest('.product-card-link');
-                        if (category === 'all' || card.getAttribute('data-category') === category) {
-                            if (cardLink) {
-                                cardLink.style.display = '';
-                                card.style.display = '';
-                            }
-                        } else {
-                            if (cardLink) {
-                                cardLink.style.display = 'none';
-                                card.style.display = 'none';
-                            }
+                    // Generate product HTML
+                    products.forEach(product => {
+                        const name = product.name || 'Produkt utan namn';
+                        const price = product.price || '0';
+                        const category = product.category || 'all';
+                        const imageUrl = product.images && product.images[0] ? product.images[0] : null;
+                        
+                        // Build URL params
+                        const params = new URLSearchParams({
+                            name: name,
+                            price: price.replace(/[^\d]/g, '') || '0',
+                            category: category
+                        });
+                        if (product.condition) params.set('condition', product.condition);
+                        if (product.url) params.set('original_url', product.url);
+                        if (product.available_conditions) {
+                            params.set('available_conditions', JSON.stringify(product.available_conditions));
                         }
+                        
+                        // Create product card HTML
+                        const productCard = document.createElement('a');
+                        productCard.href = `produkt.html?${params.toString()}`;
+                        productCard.className = 'product-card-link';
+                        productCard.innerHTML = `
+                            <div class="product-card" data-category="${category}">
+                                <div class="product-image-wrapper">
+                                    ${imageUrl ? `<img src="${imageUrl}" alt="${name.replace(/"/g, '&quot;')}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div class="product-image-placeholder">📦</div>'}
+                                </div>
+                                <div class="product-card-content">
+                                    <h3>${name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h3>
+                                    <div class="rating-stars">★★★★★</div>
+                                    <span class="review-count">(24)</span>
+                                    <span class="current-price">${price}</span>
+                                </div>
+                            </div>
+                        `;
+                        productsGrid.appendChild(productCard);
+                    });
+                    
+                    // Update productCards reference
+                    productCards = Array.from(document.querySelectorAll('.product-card-link'));
+                    console.log(`Loaded ${productCards.length} product cards`);
+                    
+                    // Initial filter and pagination
+                    filterAndSearch();
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                });
+        }
+
+        // Custom dropdown functionality
+        function initCustomDropdowns() {
+            // Category dropdown
+            const categoryBtn = document.getElementById('category-btn');
+            const categoryMenu = document.getElementById('category-menu');
+            const categorySelect = document.getElementById('category-filter');
+            const categoryOptions = categoryMenu.querySelectorAll('.category-option');
+            
+            if (categoryBtn && categoryMenu) {
+                categoryBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    categoryBtn.classList.toggle('active');
+                    categoryMenu.classList.toggle('active');
+                });
+                
+                categoryOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        const text = this.textContent;
+                        categoryBtn.querySelector('.category-selected-text').textContent = text;
+                        categorySelect.value = value;
+                        categoryBtn.classList.remove('active');
+                        categoryMenu.classList.remove('active');
+                        filterAndSearch();
                     });
                 });
-            });
-
-            // Sort functionality
-            const sortButton = document.getElementById('sort-btn');
+            }
+            
+            // Sort dropdown
+            const sortBtn = document.getElementById('sort-btn');
             const sortMenu = document.getElementById('sort-menu');
+            const sortSelect = document.getElementById('sort-select');
             const sortOptions = sortMenu.querySelectorAll('.sort-option');
-            const sortSelectedText = sortButton.querySelector('.sort-selected-text');
-            const productsGrid = document.getElementById('products-grid');
-
-            // Toggle sort dropdown
-            sortButton.addEventListener('click', function(e) {
-                e.stopPropagation();
-                sortMenu.classList.toggle('active');
-                sortButton.classList.toggle('active');
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!sortButton.contains(e.target) && !sortMenu.contains(e.target)) {
-                    sortMenu.classList.remove('active');
-                    sortButton.classList.remove('active');
-                }
-            });
-
-            // Handle sort option selection
-            sortOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const sortValue = this.getAttribute('data-sort');
-                    const text = this.textContent;
-                    
-                    sortSelectedText.textContent = text;
-                    
-                    // Update active state
-                    sortOptions.forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-                    
-                    // Close dropdown
-                    sortMenu.classList.remove('active');
-                    sortButton.classList.remove('active');
-                    
-                    // Sort products
-                    sortProducts(sortValue);
-                });
-            });
-
-            function sortProducts(sortType) {
-                if (sortType === 'default') {
-                    // Reset to original order
-                    location.reload();
-                    return;
-                }
-                
-                // Get all product links (both visible and hidden)
-                const allLinks = Array.from(productsGrid.querySelectorAll('.product-card-link'));
-                const visibleLinks = allLinks.filter(link => link.style.display !== 'none');
-                const hiddenLinks = allLinks.filter(link => link.style.display === 'none');
-                
-                // Sort only visible products
-                visibleLinks.sort((a, b) => {
-                    const cardA = a.querySelector('.product-card');
-                    const cardB = b.querySelector('.product-card');
-                    
-                    if (!cardA || !cardB) return 0;
-                    
-                    switch(sortType) {
-                        case 'price-low':
-                            const priceA = parseInt(cardA.querySelector('.current-price')?.textContent.replace(/\D/g, '') || '0');
-                            const priceB = parseInt(cardB.querySelector('.current-price')?.textContent.replace(/\D/g, '') || '0');
-                            return priceA - priceB;
-                        
-                        case 'price-high':
-                            const priceAHigh = parseInt(cardA.querySelector('.current-price')?.textContent.replace(/\D/g, '') || '0');
-                            const priceBHigh = parseInt(cardB.querySelector('.current-price')?.textContent.replace(/\D/g, '') || '0');
-                            return priceBHigh - priceAHigh;
-                        
-                        case 'name-asc':
-                            const nameA = cardA.querySelector('h3')?.textContent.trim() || '';
-                            const nameB = cardB.querySelector('h3')?.textContent.trim() || '';
-                            return nameA.localeCompare(nameB, 'sv');
-                        
-                        case 'name-desc':
-                            const nameADesc = cardA.querySelector('h3')?.textContent.trim() || '';
-                            const nameBDesc = cardB.querySelector('h3')?.textContent.trim() || '';
-                            return nameBDesc.localeCompare(nameADesc, 'sv');
-                        
-                        case 'newest':
-                            return 0;
-                        
-                        case 'popular':
-                            return 0;
-                        
-                        default:
-                            return 0;
-                    }
+            
+            if (sortBtn && sortMenu) {
+                sortBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sortBtn.classList.toggle('active');
+                    sortMenu.classList.toggle('active');
                 });
                 
-                // Remove all items from grid
-                allLinks.forEach(link => link.remove());
-                
-                // Re-append sorted visible products first (they will fill the grid properly)
-                visibleLinks.forEach(link => productsGrid.appendChild(link));
-                
-                // Append hidden products at the end (they won't be visible but maintain DOM order)
-                hiddenLinks.forEach(link => {
-                    link.style.display = 'none';
-                    productsGrid.appendChild(link);
+                sortOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        const text = this.textContent;
+                        sortBtn.querySelector('.sort-selected-text').textContent = text;
+                        sortSelect.value = value;
+                        sortBtn.classList.remove('active');
+                        sortMenu.classList.remove('active');
+                        sortProducts();
+                    });
                 });
             }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                if (categoryBtn) categoryBtn.classList.remove('active');
+                if (categoryMenu) categoryMenu.classList.remove('active');
+                if (sortBtn) sortBtn.classList.remove('active');
+                if (sortMenu) sortMenu.classList.remove('active');
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize custom dropdowns
+            initCustomDropdowns();
+            
+            // Load products from JSON first
+            loadProductsFromJSON();
+
+            // Search input
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterAndSearch);
+            }
+            
+            // Update products per page on window resize
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    filterAndSearch();
+                }, 250);
+            });
         });
     </script>
 </body>

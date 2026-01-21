@@ -19,7 +19,8 @@
         <div class="page-container">
             <div class="product-detail-container">
                 <div class="product-detail-image">
-                    <div class="product-image-placeholder-large">📦</div>
+                    <img id="product-image" src="" alt="Produktbild" style="width: 100%; height: 100%; object-fit: contain; display: none;">
+                    <div class="product-image-placeholder-large" id="product-image-placeholder">📦</div>
                 </div>
                 <div class="product-detail-info">
                     <h1 class="product-detail-title" id="product-title">Produkt</h1>
@@ -34,21 +35,20 @@
                         <label for="product-condition">Skick:</label>
                         <div class="custom-dropdown" id="product-condition-dropdown">
                             <button class="custom-dropdown-button" type="button" id="product-condition-button">
-                                <span class="dropdown-selected-text">Välj skick</span>
+                                <span class="dropdown-selected-text" id="condition-selected-text">Välj skick</span>
                                 <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </button>
                             <div class="custom-dropdown-menu" id="product-condition-menu">
                                 <div class="dropdown-option" data-value="">Välj skick</div>
-                                <div class="dropdown-option" data-value="mint">Mint</div>
-                                <div class="dropdown-option" data-value="near-mint">Near Mint</div>
-                                <div class="dropdown-option" data-value="excellent">Excellent</div>
-                                <div class="dropdown-option" data-value="very-good">Very Good</div>
-                                <div class="dropdown-option" data-value="good">Good</div>
+                                <!-- Available conditions will be dynamically added here -->
                             </div>
                             <input type="hidden" id="product-condition" name="condition" value="">
                         </div>
+                    </div>
+                    <div class="product-detail-availability" id="product-availability" style="margin: 1rem 0; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; display: none;">
+                        <strong>Lagerstatus:</strong> <span id="availability-text"></span>
                     </div>
                     <div class="product-detail-description">
                         <p id="product-description">Produktbeskrivning kommer här...</p>
@@ -65,6 +65,7 @@
     <div id="footer-container"></div>
     
     <script src="../components/navbar.js"></script>
+    <script src="../script.js"></script>
     <script>
         // Load footer
         (function() {
@@ -83,92 +84,291 @@
             }
         })();
 
-        // Get product data from URL parameters
+        // Load product data from JSON file
         (function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-            const productName = urlParams.get('name');
+            const productName = decodeURIComponent(urlParams.get('name') || '');
             const productPrice = urlParams.get('price');
             const productCategory = urlParams.get('category');
+            const productCondition = urlParams.get('condition');
+            const originalUrl = urlParams.get('original_url');
+            const availability = urlParams.get('availability');
+            const availableConditionsParam = urlParams.get('available_conditions');
 
-            if (productName) {
-                document.getElementById('product-title').textContent = productName;
-                document.title = productName + ' - Seriecentrum';
-            }
+            // Load products from JSON
+            fetch('../products.json')
+                .then(response => response.json())
+                .then(products => {
+                    // Find matching product
+                    let product = null;
+                    
+                    if (originalUrl) {
+                        // Try to find by original URL first
+                        product = products.find(p => p.url === decodeURIComponent(originalUrl));
+                    }
+                    
+                    if (!product && productName) {
+                        // Fall back to finding by name
+                        product = products.find(p => p.name === productName);
+                    }
 
-            if (productPrice) {
-                document.getElementById('product-price').textContent = productPrice + ' kr';
-            }
+                    // Update page with product data
+                    if (product) {
+                        // Title
+                        document.getElementById('product-title').textContent = product.name;
+                        document.title = product.name + ' - Seriecentrum';
 
-            // You can expand this to load more product details from a database or JSON file
-            // For now, we'll use the URL parameters
+                        // Price
+                        const price = productPrice || product.price || '0';
+                        document.getElementById('product-price').textContent = price + (price.includes('kr') || price.includes('Kr') ? '' : ' kr');
+
+                        // Image
+                        const imageElement = document.getElementById('product-image');
+                        const placeholderElement = document.getElementById('product-image-placeholder');
+                        
+                        if (product.images && product.images.length > 0) {
+                            imageElement.src = product.images[0];
+                            imageElement.style.display = 'block';
+                            placeholderElement.style.display = 'none';
+                        } else {
+                            imageElement.style.display = 'none';
+                            placeholderElement.style.display = 'block';
+                        }
+
+                        // Get available conditions
+                        let availableConditions = [];
+                        if (product.available_conditions && product.available_conditions.length > 0) {
+                            availableConditions = product.available_conditions;
+                        } else if (availableConditionsParam) {
+                            try {
+                                availableConditions = JSON.parse(decodeURIComponent(availableConditionsParam));
+                            } catch (e) {
+                                console.error('Error parsing available conditions:', e);
+                            }
+                        }
+                        
+                        // Populate condition dropdown with available conditions
+                        const conditionMenu = document.getElementById('product-condition-menu');
+                        // Clear existing options
+                        conditionMenu.innerHTML = '<div class="dropdown-option" data-value="">Välj skick</div>';
+                        
+                        // Add available conditions to dropdown
+                        if (availableConditions.length > 0) {
+                            availableConditions.forEach(condition => {
+                                const option = document.createElement('div');
+                                option.className = 'dropdown-option';
+                                option.setAttribute('data-value', condition.toLowerCase().replace(/\s+/g, '-'));
+                                option.textContent = condition;
+                                conditionMenu.appendChild(option);
+                            });
+                            
+                            // Set default condition (first available)
+                            const conditionFromProduct = product.condition || productCondition || availableConditions[0];
+                            if (conditionFromProduct) {
+                                const conditionValue = conditionFromProduct.toLowerCase().replace(/\s+/g, '-');
+                                const conditionText = conditionFromProduct;
+                                
+                                const hiddenInput = document.getElementById('product-condition');
+                                const selectedText = document.getElementById('condition-selected-text');
+                                
+                                hiddenInput.value = conditionValue;
+                                selectedText.textContent = conditionText;
+                                
+                                // Mark option as selected
+                                const dropdownOptions = conditionMenu.querySelectorAll('.dropdown-option');
+                                dropdownOptions.forEach(opt => {
+                                    if (opt.getAttribute('data-value') === conditionValue) {
+                                        opt.classList.add('selected');
+                                    }
+                                });
+                                
+                                // Enable add to cart button
+                                document.getElementById('add-to-cart-btn').disabled = false;
+                            }
+                        } else {
+                            // No conditions available, use default options
+                            const defaultConditions = ['Mint', 'Near Mint', 'Excellent', 'Very Good', 'Good'];
+                            defaultConditions.forEach(condition => {
+                                const option = document.createElement('div');
+                                option.className = 'dropdown-option';
+                                option.setAttribute('data-value', condition.toLowerCase().replace(/\s+/g, '-'));
+                                option.textContent = condition;
+                                conditionMenu.appendChild(option);
+                            });
+                        }
+                        
+                        // Re-initialize dropdown event listeners after conditions are added
+                        initializeDropdown();
+
+                        // Availability
+                        const availabilityText = product.availability || availability;
+                        if (availabilityText) {
+                            const availabilityDiv = document.getElementById('product-availability');
+                            const availabilitySpan = document.getElementById('availability-text');
+                            
+                            if (availabilityText === '1' || availabilityText.toLowerCase() === 'i lager') {
+                                availabilitySpan.textContent = 'I lager';
+                                availabilitySpan.style.color = '#4ade80';
+                            } else if (availabilityText.toLowerCase().includes('ej') || availabilityText.toLowerCase().includes('slut')) {
+                                availabilitySpan.textContent = availabilityText;
+                                availabilitySpan.style.color = '#f87171';
+                            } else {
+                                availabilitySpan.textContent = `Tillgängliga: ${availabilityText}`;
+                            }
+                            
+                            availabilityDiv.style.display = 'block';
+                        }
+
+                        // Description
+                        if (product.description) {
+                            document.getElementById('product-description').textContent = product.description;
+                        } else {
+                            document.getElementById('product-description').textContent = 'Ingen beskrivning tillgänglig för denna produkt.';
+                        }
+                    } else {
+                        // Fallback to URL parameters if product not found in JSON
+                        if (productName) {
+                            document.getElementById('product-title').textContent = productName;
+                            document.title = productName + ' - Seriecentrum';
+                        }
+
+                        if (productPrice) {
+                            document.getElementById('product-price').textContent = productPrice + ' kr';
+                        }
+                        
+                        if (productCondition) {
+                            const hiddenInput = document.getElementById('product-condition');
+                            const selectedText = document.getElementById('condition-selected-text');
+                            hiddenInput.value = productCondition.toLowerCase().replace(' ', '-');
+                            selectedText.textContent = productCondition;
+                            document.getElementById('add-to-cart-btn').disabled = false;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    // Fallback to URL parameters
+                    if (productName) {
+                        document.getElementById('product-title').textContent = productName;
+                        document.title = productName + ' - Seriecentrum';
+                    }
+                    if (productPrice) {
+                        document.getElementById('product-price').textContent = productPrice + ' kr';
+                    }
+                });
         })();
 
         // Handle custom dropdown
-        (function() {
+        let selectedConditionText = '';
+        
+        function initializeDropdown() {
             const dropdownButton = document.getElementById('product-condition-button');
             const dropdownMenu = document.getElementById('product-condition-menu');
-            const dropdownOptions = dropdownMenu.querySelectorAll('.dropdown-option');
             const hiddenInput = document.getElementById('product-condition');
-            const selectedText = dropdownButton.querySelector('.dropdown-selected-text');
+            const selectedText = document.getElementById('condition-selected-text');
             const addToCartBtn = document.getElementById('add-to-cart-btn');
 
+            if (!dropdownButton || !dropdownMenu) return;
+
+            // Remove old event listeners by removing and re-adding
+            const newButton = dropdownButton.cloneNode(true);
+            dropdownButton.parentNode.replaceChild(newButton, dropdownButton);
+            const newMenu = dropdownMenu.cloneNode(true);
+            dropdownMenu.parentNode.replaceChild(newMenu, dropdownMenu);
+
+            // Get new references
+            const newDropdownButton = document.getElementById('product-condition-button');
+            const newDropdownMenu = document.getElementById('product-condition-menu');
+            const newDropdownOptions = newDropdownMenu.querySelectorAll('.dropdown-option');
+            const newSelectedText = document.getElementById('condition-selected-text'); // Get fresh reference after cloning
+
             // Toggle dropdown
-            dropdownButton.addEventListener('click', function(e) {
+            newDropdownButton.addEventListener('click', function(e) {
                 e.stopPropagation();
-                dropdownMenu.classList.toggle('active');
-                dropdownButton.classList.toggle('active');
+                newDropdownMenu.classList.toggle('active');
+                newDropdownButton.classList.toggle('active');
             });
 
             // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                    dropdownMenu.classList.remove('active');
-                    dropdownButton.classList.remove('active');
+            const closeHandler = function(e) {
+                if (!newDropdownButton.contains(e.target) && !newDropdownMenu.contains(e.target)) {
+                    newDropdownMenu.classList.remove('active');
+                    newDropdownButton.classList.remove('active');
                 }
-            });
+            };
+            document.addEventListener('click', closeHandler);
 
             // Handle option selection
-            dropdownOptions.forEach(option => {
+            newDropdownOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     const value = this.getAttribute('data-value');
                     const text = this.textContent;
                     
-                    hiddenInput.value = value;
-                    selectedText.textContent = text;
+                    if (hiddenInput) {
+                        hiddenInput.value = value;
+                    }
+                    
+                    if (newSelectedText) {
+                        newSelectedText.textContent = text;
+                    }
+                    
+                    selectedConditionText = text; // Store the text for add to cart
                     
                     // Update active state
-                    dropdownOptions.forEach(opt => opt.classList.remove('selected'));
+                    newDropdownOptions.forEach(opt => opt.classList.remove('selected'));
                     this.classList.add('selected');
                     
                     // Close dropdown
-                    dropdownMenu.classList.remove('active');
-                    dropdownButton.classList.remove('active');
+                    newDropdownMenu.classList.remove('active');
+                    newDropdownButton.classList.remove('active');
                     
                     // Enable/disable add to cart button
-                    if (value) {
-                        addToCartBtn.disabled = false;
-                    } else {
-                        addToCartBtn.disabled = true;
+                    if (addToCartBtn) {
+                        if (value) {
+                            addToCartBtn.disabled = false;
+                        } else {
+                            addToCartBtn.disabled = true;
+                        }
                     }
                 });
             });
+        }
+
+        // Initialize dropdown on page load (will be called after product data loads)
+        (function() {
+            // Initial setup - will be re-initialized after conditions are loaded
+            initializeDropdown();
 
             // Handle add to cart
-            addToCartBtn.addEventListener('click', function() {
-                if (!this.disabled && hiddenInput.value) {
-                    const productName = document.getElementById('product-title').textContent;
-                    const productPrice = document.getElementById('product-price').textContent;
-                    const condition = hiddenInput.value;
-                    
-                    if (typeof addToCart === 'function') {
-                        addToCart(productName, condition, productPrice);
-                        alert('Produkten har lagts till i varukorgen!');
-                    } else {
-                        console.log('Add to cart function not available');
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            const hiddenInput = document.getElementById('product-condition');
+            
+            if (addToCartBtn) {
+                const originalButtonText = addToCartBtn.textContent;
+                
+                addToCartBtn.addEventListener('click', function() {
+                    if (!this.disabled && hiddenInput && hiddenInput.value) {
+                        const productName = document.getElementById('product-title').textContent;
+                        const productPrice = document.getElementById('product-price').textContent;
+                        // Use stored condition text or fallback to selected text
+                        const condition = selectedConditionText || document.getElementById('condition-selected-text').textContent;
+                        
+                        if (typeof addToCart === 'function') {
+                            addToCart(productName, condition, productPrice);
+                            
+                            // Change button text to "Tillagd produkt"
+                            addToCartBtn.textContent = 'Tillagd produkt';
+                            
+                            // Reset button text after 1.5 seconds
+                            setTimeout(function() {
+                                addToCartBtn.textContent = originalButtonText;
+                            }, 1500);
+                        } else {
+                            console.error('Add to cart function not available. Make sure script.js is loaded.');
+                        }
                     }
-                }
-            });
+                });
+            }
         })();
     </script>
 </body>
