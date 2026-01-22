@@ -217,34 +217,25 @@ const Product = () => {
             <div className="product-detail-pricing">
               <span className="current-price">{finalPrice}</span>
             </div>
-            <div className="product-detail-condition">
-              <label htmlFor="product-condition">Skick:</label>
-              <div className="custom-dropdown">
-                <button
-                  className={`custom-dropdown-button ${conditionDropdownOpen ? 'active' : ''}`}
-                  type="button"
-                  onClick={() => setConditionDropdownOpen(!conditionDropdownOpen)}
-                >
-                  <span className="dropdown-selected-text">
-                    {selectedCondition || 'Välj skick'}
-                  </span>
-                  <svg className="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                {conditionDropdownOpen && (
-                  <div className="custom-dropdown-menu active">
-                    <div
-                      className="dropdown-option"
-                      onClick={() => {
-                        setSelectedCondition('')
-                        setSelectedConditionData(null)
-                        setConditionDropdownOpen(false)
-                      }}
-                    >
-                      Välj skick
-                    </div>
-                    {availableConditions.map((conditionData, index) => {
+            {availableConditions.length > 0 && (
+              <div className="product-detail-condition">
+                <label htmlFor="product-condition">Skick:</label>
+                <div className="custom-dropdown">
+                  <button
+                    className={`custom-dropdown-button ${conditionDropdownOpen ? 'active' : ''}`}
+                    type="button"
+                    onClick={() => setConditionDropdownOpen(!conditionDropdownOpen)}
+                  >
+                    <span className="dropdown-selected-text">
+                      {selectedCondition || 'Välj skick'}
+                    </span>
+                    <svg className="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  {conditionDropdownOpen && (
+                    <div className="custom-dropdown-menu active">
+                      {availableConditions.map((conditionData, index) => {
                       const condition = typeof conditionData === 'object' ? conditionData.condition : conditionData
                       const conditionPrice = typeof conditionData === 'object' ? conditionData.price : null
                       const conditionAvailability = typeof conditionData === 'object' ? conditionData.availability : null
@@ -289,10 +280,11 @@ const Product = () => {
                         </div>
                       )
                     })}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             {product.availability && (
               <div className="product-detail-availability" style={{ margin: '1rem 0', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px' }}>
                 <strong>Lagerstatus:</strong>{' '}

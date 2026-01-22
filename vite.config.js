@@ -12,7 +12,20 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        timeout: 10000,
+        proxyTimeout: 10000,
+        onError: (err, req, res) => {
+          // Handle proxy errors gracefully
+          if (res && !res.headersSent) {
+            res.writeHead(503, {
+              'Content-Type': 'application/json'
+            });
+            res.end(JSON.stringify({ 
+              error: 'Backend server is not running. Please start it with "npm run server"' 
+            }));
+          }
+        }
       }
     }
   },

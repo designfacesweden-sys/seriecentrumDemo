@@ -7,9 +7,11 @@ const AdminProducts = () => {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(false)
+  const [importing, setImporting] = useState(false)
   const [error, setError] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [totalProducts, setTotalProducts] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -44,15 +46,25 @@ const AdminProducts = () => {
       if (selectedCategory) params.append('category', selectedCategory)
 
       const response = await fetch(`${API_URL}/products?${params}`)
-      if (response.ok) {
-        const data = await response.json()
-        setProducts(data.products)
-        setTotalPages(data.pagination.pages)
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        setError(errorData.error || 'Kunde inte ladda produkter')
+        setProducts([])
+        return
+      }
+      
+      const data = await response.json()
+      setProducts(data.products || [])
+      if (data.pagination) {
+        setTotalPages(data.pagination.pages || 1)
+        setTotalProducts(data.pagination.total || 0)
       } else {
-        setError('Kunde inte ladda produkter')
+        setTotalPages(1)
+        setTotalProducts(data.products?.length || 0)
       }
     } catch (err) {
-      setError('Kunde inte ansluta till servern')
+      setError('Kunde inte ansluta till servern. Kontrollera att backend-servern körs.')
+      setProducts([])
     } finally {
       setLoading(false)
     }
@@ -169,13 +181,20 @@ const AdminProducts = () => {
     setError('')
 
     try {
-      // Process available conditions - only include those with condition name and (price or stock)
+      // Process available conditions - include all with condition name and at least price or stock
+      // Allow stock = 0 as long as there's a condition name and price
       const processedConditions = availableConditions
-        .filter(c => c.condition && c.condition.trim() !== '' && ((c.price && parseFloat(c.price) > 0) || (c.stock && parseInt(c.stock) > 0)))
+        .filter(c => {
+          const hasConditionName = c.condition && c.condition.trim() !== ''
+          const hasPrice = c.price && parseFloat(c.price) > 0
+          const hasStock = c.stock && parseInt(c.stock) > 0
+          // Include if it has a name and either price or stock (or both)
+          return hasConditionName && (hasPrice || hasStock)
+        })
         .map(c => ({
           condition: c.condition.trim(),
           price: parseFloat(c.price) || 0,
-          stock: parseInt(c.stock) || 0
+          stock: parseInt(c.stock) || 0  // Allow 0, don't default to 0 if empty
         }))
 
       // Validate that at least one condition exists
@@ -251,6 +270,39 @@ const AdminProducts = () => {
     }
   }
 
+  const handleImportProducts = async () => {
+    if (!window.confirm('Detta kommer att radera alla befintliga produkter och importera från products.json. Fortsätt?')) {
+      return
+    }
+
+    setImporting(true)
+    setError('')
+    try {
+      const response = await fetch(`${API_URL}/products/import`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        alert(`✅ ${data.message}\nTotalt: ${data.total} produkter\nUnika: ${data.unique} produkter`)
+        loadProducts()
+        loadCategories()
+      } else {
+        setError(data.error || 'Kunde inte importera produkter')
+        alert(data.error || 'Kunde inte importera produkter')
+      }
+    } catch (err) {
+      setError('Kunde inte ansluta till servern')
+      alert('Kunde inte ansluta till servern. Kontrollera att backend-servern körs.')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   return (
     <AdminLayout>
       <section className="admin-page-section">
@@ -258,18 +310,39 @@ const AdminProducts = () => {
           <div className="admin-header-content">
             <div>
               <h1 className="admin-page-title">Produkter</h1>
-              <p className="admin-page-subtitle">Hantera alla produkter</p>
+              <p className="admin-page-subtitle">
+                Hantera alla produkter
+                {totalProducts > 0 && (
+                  <span style={{ marginLeft: '0.75rem', color: 'rgba(255, 255, 255, 0.6)', fontWeight: 400 }}>
+                    ({totalProducts} {totalProducts === 1 ? 'produkt' : 'produkter'})
+                  </span>
+                )}
+              </p>
             </div>
-            <button 
-              className="admin-add-button"
-              onClick={() => handleOpenModal()}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Lägg till produkt
-            </button>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+              <button 
+                className="admin-add-button"
+                onClick={handleImportProducts}
+                disabled={importing}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                {importing ? 'Importerar...' : 'Importera produkter'}
+              </button>
+              <button 
+                className="admin-add-button"
+                onClick={() => handleOpenModal()}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Lägg till produkt
+              </button>
+            </div>
           </div>
         </div>
 
@@ -335,7 +408,29 @@ const AdminProducts = () => {
                   </thead>
                   <tbody>
                     {products.map((product) => {
-                      const totalStock = product.availableConditions?.reduce((sum, c) => sum + (c.stock || 0), 0) || product.stock || 0
+                      // Calculate total stock - convert to number and sum all conditions
+                      // Make sure we handle all cases: string, number, null, undefined
+                      let totalStock = 0
+                      if (product.availableConditions && product.availableConditions.length > 0) {
+                        totalStock = product.availableConditions.reduce((sum, c) => {
+                          let stockValue = 0
+                          if (c.stock !== null && c.stock !== undefined && c.stock !== '') {
+                            if (typeof c.stock === 'string') {
+                              stockValue = parseInt(c.stock, 10)
+                              if (isNaN(stockValue)) stockValue = 0
+                            } else if (typeof c.stock === 'number') {
+                              stockValue = c.stock
+                            }
+                          }
+                          return sum + stockValue
+                        }, 0)
+                      } else if (product.stock !== null && product.stock !== undefined && product.stock !== '') {
+                        if (typeof product.stock === 'string') {
+                          totalStock = parseInt(product.stock, 10) || 0
+                        } else {
+                          totalStock = product.stock || 0
+                        }
+                      }
                       const conditionsCount = product.availableConditions?.length || 0
                       const lowestPrice = product.availableConditions?.length > 0 
                         ? Math.min(...product.availableConditions.map(c => c.price || 0).filter(p => p > 0))
@@ -427,9 +522,6 @@ const AdminProducts = () => {
                   >
                     Föregående
                   </button>
-                  <span className="pagination-info">
-                    Sida {page} av {totalPages}
-                  </span>
                   <button
                     className="pagination-btn"
                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}

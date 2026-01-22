@@ -69,6 +69,7 @@ const AdminTournaments = () => {
   const handleOpenModal = (tournament = null) => {
     if (tournament) {
       setEditingTournament(tournament._id)
+      const prizes = tournament.prizes || []
       setFormData({
         name: tournament.name || '',
         description: tournament.description || '',
@@ -80,8 +81,15 @@ const AdminTournaments = () => {
         maxPlayers: tournament.maxPlayers || 24,
         rules: tournament.rules || '',
         timePerRound: tournament.timePerRound || 50,
-        prizes: tournament.prizes || []
+        prizes: prizes
       })
+      // Set prizeInput to first available position
+      const usedPositions = prizes.map(p => {
+        const pos = prizePositions.find(pp => pp.label === p.position)
+        return pos ? pos.value : null
+      }).filter(Boolean)
+      const nextPosition = prizePositions.find(p => !usedPositions.includes(p.value))
+      setPrizeInput({ position: nextPosition ? nextPosition.value : '1', prize: '' })
     } else {
       setEditingTournament(null)
       setFormData({
@@ -97,6 +105,7 @@ const AdminTournaments = () => {
         timePerRound: 50,
         prizes: []
       })
+      setPrizeInput({ position: '1', prize: '' })
     }
     setIsModalOpen(true)
     setError('')
@@ -117,26 +126,34 @@ const AdminTournaments = () => {
 
   const handleAddPrize = () => {
     if (prizeInput.position && prizeInput.prize) {
-      // Check if position already exists
-      const positionExists = formData.prizes.some(p => p.position === prizeInput.position)
-      if (positionExists) {
-        setError(`Plats ${prizeInput.position} är redan tillagd`)
+      // Check if position already exists by comparing position values
+      const selectedPosition = prizePositions.find(p => p.value === prizeInput.position)
+      if (!selectedPosition) {
+        setError('Ogiltig plats vald')
         return
       }
       
-      const selectedPosition = prizePositions.find(p => p.value === prizeInput.position)
+      // Check if this position label already exists in prizes
+      const positionExists = formData.prizes.some(p => p.position === selectedPosition.label)
+      if (positionExists) {
+        setError(`${selectedPosition.label} är redan tillagd`)
+        return
+      }
+      
       setFormData({
         ...formData,
         prizes: [...formData.prizes, { 
-          position: selectedPosition ? selectedPosition.label : prizeInput.position, 
+          position: selectedPosition.label, 
           prize: prizeInput.prize 
         }]
       })
+      
       // Set next available position
       const usedPositions = formData.prizes.map(p => {
         const pos = prizePositions.find(pp => pp.label === p.position)
         return pos ? pos.value : null
       }).filter(Boolean)
+      usedPositions.push(prizeInput.position) // Add the one we just used
       const nextPosition = prizePositions.find(p => !usedPositions.includes(p.value))
       setPrizeInput({ position: nextPosition ? nextPosition.value : '1', prize: '' })
       setError('')
@@ -144,10 +161,18 @@ const AdminTournaments = () => {
   }
 
   const handleRemovePrize = (index) => {
+    const newPrizes = formData.prizes.filter((_, i) => i !== index)
     setFormData({
       ...formData,
-      prizes: formData.prizes.filter((_, i) => i !== index)
+      prizes: newPrizes
     })
+    // Update prizeInput to show first available position after removal
+    const usedPositions = newPrizes.map(p => {
+      const pos = prizePositions.find(pp => pp.label === p.position)
+      return pos ? pos.value : null
+    }).filter(Boolean)
+    const nextPosition = prizePositions.find(p => !usedPositions.includes(p.value))
+    setPrizeInput({ position: nextPosition ? nextPosition.value : '1', prize: '' })
   }
 
   const handleSubmit = async (e) => {
@@ -488,16 +513,7 @@ const AdminTournaments = () => {
                     <div className="prize-input-row">
                       <select
                         value={prizeInput.position}
-                        onChange={(e) => {
-                          const usedPositions = formData.prizes.map(p => {
-                            const pos = prizePositions.find(pp => pp.label === p.position)
-                            return pos ? pos.value : null
-                          }).filter(Boolean)
-                          const available = prizePositions.filter(p => !usedPositions.includes(p.value))
-                          if (available.length > 0) {
-                            setPrizeInput({ ...prizeInput, position: e.target.value })
-                          }
-                        }}
+                        onChange={(e) => setPrizeInput({ ...prizeInput, position: e.target.value })}
                         className="prize-position-select"
                       >
                         {prizePositions
