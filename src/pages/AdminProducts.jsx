@@ -79,7 +79,7 @@ const AdminProducts = () => {
         ])
       }
     } catch (err) {
-      console.error('Error loading categories:', err)
+      // Error loading categories
       // Fallback to default categories on error
       setCategories([
         'Serier',
@@ -314,40 +314,107 @@ const AdminProducts = () => {
             <div className="admin-loading">Laddar produkter...</div>
           ) : products.length === 0 ? (
             <div className="admin-empty">
-              <p>Inga produkter hittades.</p>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>📦</div>
+              <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 600 }}>Inga produkter hittades</p>
+              <p style={{ fontSize: '0.95rem', opacity: 0.7 }}>Skapa din första produkt för att komma igång</p>
             </div>
           ) : (
             <>
-              <div className="products-grid">
-                {products.map((product) => (
-                  <div key={product._id} className="product-card-admin">
-                    {product.image && (
-                      <div className="product-image-admin">
-                        <img src={product.image} alt={product.name} />
-                      </div>
-                    )}
-                    <div className="product-info-admin">
-                      <h3 className="product-name-admin">{product.name}</h3>
-                      <p className="product-category-admin">{product.category}</p>
-                      <p className="product-price-admin">{product.price} kr</p>
-                      <p className="product-stock-admin">Lager: {product.stock || 0}</p>
-                    </div>
-                    <div className="product-actions-admin">
-                      <button
-                        className="edit-btn"
-                        onClick={() => handleOpenModal(product)}
-                      >
-                        Redigera
-                      </button>
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDelete(product._id)}
-                      >
-                        Ta bort
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              <div className="products-list-container">
+                <table className="products-list-table">
+                  <thead>
+                    <tr>
+                      <th className="col-image">Bild</th>
+                      <th className="col-name">Namn</th>
+                      <th className="col-category">Kategori</th>
+                      <th className="col-price">Pris</th>
+                      <th className="col-stock">Lager</th>
+                      <th className="col-conditions">Kvaliteter</th>
+                      <th className="col-actions">Åtgärder</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {products.map((product) => {
+                      const totalStock = product.availableConditions?.reduce((sum, c) => sum + (c.stock || 0), 0) || product.stock || 0
+                      const conditionsCount = product.availableConditions?.length || 0
+                      const lowestPrice = product.availableConditions?.length > 0 
+                        ? Math.min(...product.availableConditions.map(c => c.price || 0).filter(p => p > 0))
+                        : product.price || 0
+                      
+                      return (
+                        <tr key={product._id} className="product-row">
+                          <td className="col-image">
+                            {product.image ? (
+                              <img 
+                                src={product.image} 
+                                alt={product.name}
+                                className="product-list-image"
+                                onError={(e) => {
+                                  e.target.style.display = 'none'
+                                  e.target.nextSibling.style.display = 'flex'
+                                }}
+                              />
+                            ) : null}
+                            <div className="product-list-image-placeholder" style={{ display: product.image ? 'none' : 'flex' }}>
+                              <span>📦</span>
+                            </div>
+                          </td>
+                          <td className="col-name">
+                            <div className="product-list-name">{product.name}</div>
+                            {product.description && (
+                              <div className="product-list-description" title={product.description}>
+                                {product.description.length > 60 
+                                  ? product.description.substring(0, 60) + '...' 
+                                  : product.description}
+                              </div>
+                            )}
+                          </td>
+                          <td className="col-category">
+                            <span className="category-badge">{product.category}</span>
+                          </td>
+                          <td className="col-price">
+                            <span className="price-value">{lowestPrice > 0 ? `${lowestPrice} kr` : '-'}</span>
+                            {product.availableConditions && product.availableConditions.length > 1 && (
+                              <div className="price-range">
+                                {Math.max(...product.availableConditions.map(c => c.price || 0))} kr
+                              </div>
+                            )}
+                          </td>
+                          <td className="col-stock">
+                            <span className="stock-value">{totalStock}</span>
+                          </td>
+                          <td className="col-conditions">
+                            {conditionsCount > 0 ? (
+                              <div className="conditions-badge">
+                                {conditionsCount} {conditionsCount === 1 ? 'kvalitet' : 'kvaliteter'}
+                              </div>
+                            ) : (
+                              <span className="no-conditions">-</span>
+                            )}
+                          </td>
+                          <td className="col-actions">
+                            <div className="product-list-actions">
+                              <button
+                                className="edit-btn-small"
+                                onClick={() => handleOpenModal(product)}
+                                title="Redigera"
+                              >
+                                Redigera
+                              </button>
+                              <button
+                                className="delete-btn-small"
+                                onClick={() => handleDelete(product._id)}
+                                title="Ta bort"
+                              >
+                                Ta bort
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
               </div>
 
               {/* Pagination */}

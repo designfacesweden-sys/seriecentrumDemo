@@ -54,14 +54,14 @@ const Shop = () => {
               setAvailableCategories(categoryOptions)
             }
           } catch (err) {
-            console.warn('Could not load categories from API')
+            // Could not load categories from API
           }
           
           setLoading(false)
           return
         }
       } catch (error) {
-        console.warn('API not available, falling back to products.json:', error)
+        // API not available, falling back to products.json
       }
       
       // Fallback to products.json if API fails
@@ -117,7 +117,7 @@ const Shop = () => {
         setProducts(uniqueProducts)
         setLoading(false)
       } catch (error) {
-        console.error('Error loading products:', error)
+        // Error loading products
         setLoading(false)
       }
     }

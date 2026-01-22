@@ -24,56 +24,35 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/seriec
 async function connectDB() {
   try {
     if (!MONGODB_URI || MONGODB_URI.includes('<cluster-url>') || MONGODB_URI.includes('localhost')) {
-      console.warn('⚠️  MongoDB URI inte konfigurerad korrekt');
-      console.warn('   Skapa en .env-fil med MONGODB_URI');
-      console.warn('   Kör: npm run setup-env');
       return null;
     }
 
     const client = new MongoClient(MONGODB_URI);
     await client.connect();
     db = client.db();
-    console.log('✅ Ansluten till MongoDB');
-    console.log(`📊 Database: ${db.databaseName}`);
     
     // Create indexes for better performance
     try {
-      // Products indexes
       await db.collection('products').createIndex({ name: 'text', description: 'text' });
       await db.collection('products').createIndex({ category: 1 });
       await db.collection('products').createIndex({ createdAt: -1 });
-      
-      // Accounts (users) indexes
       await db.collection('accounts').createIndex({ email: 1 }, { unique: true });
       await db.collection('accounts').createIndex({ createdAt: -1 });
-      
-      // Receipts (orders) indexes
       await db.collection('receipts').createIndex({ accountId: 1 });
       await db.collection('receipts').createIndex({ createdAt: -1 });
       await db.collection('receipts').createIndex({ orderNumber: 1 }, { unique: true, sparse: true });
       await db.collection('receipts').createIndex({ status: 1 });
-      
-      // Tournaments indexes
       await db.collection('tournaments').createIndex({ status: 1 });
       await db.collection('tournaments').createIndex({ startDate: 1 });
       await db.collection('tournaments').createIndex({ createdAt: -1 });
       await db.collection('tournaments').createIndex({ 'participants.userId': 1 });
       await db.collection('tournaments').createIndex({ 'participants.email': 1 });
-      
-      console.log('✅ Indexes skapade');
     } catch (indexError) {
       // Indexes might already exist, that's okay
-      console.log('ℹ️  Indexes redan skapade eller kunde inte skapas');
     }
     
     return client;
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error.message);
-    if (error.message.includes('authentication')) {
-      console.error('   Kontrollera användarnamn och lösenord i .env');
-    } else if (error.message.includes('ENOTFOUND')) {
-      console.error('   Kontrollera kluster-URL i .env');
-    }
     return null;
   }
 }
@@ -82,12 +61,8 @@ async function connectDB() {
 let mongoClient;
 connectDB().then(client => {
   mongoClient = client;
-  if (client) {
-    console.log('✅ MongoDB anslutning klar');
-  }
 }).catch(err => {
-  console.error('Failed to connect to MongoDB:', err);
-  console.log('⚠️  Server körs i fallback-läge (localStorage)');
+  // Silent error handling
 });
 
 // ==================== ACCOUNTS (Users) ====================
@@ -114,9 +89,15 @@ app.post('/api/users/register', async (req, res) => {
       return res.status(400).json({ error: 'Ogiltig e-postadress' });
     }
 
-    // Check if account exists
-    const existing = await db.collection('accounts').findOne({ email: email.toLowerCase() });
-    if (existing) {
+    // Check if account exists in both collections
+    const existingInAccounts = await db.collection('accounts').findOne({ 
+      email: email.toLowerCase().trim() 
+    });
+    const existingInUsers = await db.collection('users').findOne({ 
+      email: email.toLowerCase().trim() 
+    });
+    
+    if (existingInAccounts || existingInUsers) {
       return res.status(400).json({ error: 'E-postadressen är redan registrerad' });
     }
 
@@ -141,7 +122,6 @@ app.post('/api/users/register', async (req, res) => {
     const { password: _, ...accountWithoutPassword } = account;
     res.status(201).json({ user: accountWithoutPassword, message: 'Konto skapat!' });
   } catch (error) {
-    console.error('Error creating account:', error);
     res.status(500).json({ error: 'Kunde inte skapa konto' });
   }
 });
@@ -161,24 +141,74 @@ app.post('/api/users/login', async (req, res) => {
 
     // Try accounts collection first, fallback to users for backward compatibility
     let account = await db.collection('accounts').findOne({ 
-      email: email.toLowerCase() 
+      email: email.toLowerCase().trim() 
     });
     
     if (!account) {
       account = await db.collection('users').findOne({ 
-        email: email.toLowerCase() 
+        email: email.toLowerCase().trim() 
       });
     }
 
-    if (!account || account.password !== password) {
-      return res.status(401).json({ error: 'Ogiltig e-post eller lösenord' });
+    // Verify account exists in database
+    if (!account) {
+      return res.status(401).json({ error: 'Inget konto hittades med denna e-postadress' });
+    }
+
+    // Verify password
+    if (account.password !== password) {
+      return res.status(401).json({ error: 'Felaktigt lösenord' });
+    }
+
+    // Double-check account still exists (in case it was deleted between checks)
+    const accountStillExists = await db.collection('accounts').findOne({ 
+      _id: account._id 
+    }) || await db.collection('users').findOne({ 
+      _id: account._id 
+    });
+
+    if (!accountStillExists) {
+      return res.status(401).json({ error: 'Kontot finns inte längre i systemet' });
     }
 
     const { password: _, ...accountWithoutPassword } = account;
     res.json({ user: accountWithoutPassword, message: 'Inloggning lyckades!' });
   } catch (error) {
-    console.error('Error logging in:', error);
     res.status(500).json({ error: 'Kunde inte logga in' });
+  }
+});
+
+// Verify account exists (for session validation)
+app.get('/api/users/verify/:id', async (req, res) => {
+  try {
+    if (!db) {
+      return res.status(503).json({ error: 'Database not available' });
+    }
+
+    const accountId = req.params.id;
+    if (!accountId) {
+      return res.status(400).json({ error: 'Konto-ID krävs' });
+    }
+
+    // Try accounts collection first, fallback to users for backward compatibility
+    let account = await db.collection('accounts').findOne({ 
+      _id: new ObjectId(accountId) 
+    });
+    
+    if (!account) {
+      account = await db.collection('users').findOne({ 
+        _id: new ObjectId(accountId) 
+      });
+    }
+
+    if (!account) {
+      return res.status(404).json({ exists: false, error: 'Konto hittades inte i databasen' });
+    }
+
+    const { password: _, ...accountWithoutPassword } = account;
+    res.json({ exists: true, user: accountWithoutPassword });
+  } catch (error) {
+    res.status(500).json({ exists: false, error: 'Kunde inte verifiera konto' });
   }
 });
 
@@ -189,19 +219,24 @@ app.get('/api/users/:id', async (req, res) => {
       return res.status(503).json({ error: 'Database not available' });
     }
 
+    const accountId = req.params.id;
+    if (!accountId) {
+      return res.status(400).json({ error: 'Konto-ID krävs' });
+    }
+
     // Try accounts collection first, fallback to users for backward compatibility
     let account = await db.collection('accounts').findOne({ 
-      _id: new ObjectId(req.params.id) 
+      _id: new ObjectId(accountId) 
     });
     
     if (!account) {
       account = await db.collection('users').findOne({ 
-        _id: new ObjectId(req.params.id) 
+        _id: new ObjectId(accountId) 
       });
     }
 
     if (!account) {
-      return res.status(404).json({ error: 'Konto hittades inte' });
+      return res.status(404).json({ error: 'Konto hittades inte i databasen' });
     }
 
     // Populate order history
@@ -223,18 +258,16 @@ app.get('/api/users/:id', async (req, res) => {
     const { password: _, ...accountWithoutPassword } = account;
     res.json(accountWithoutPassword);
   } catch (error) {
-    console.error('Error fetching account:', error);
     res.status(500).json({ error: 'Kunde inte hämta konto' });
   }
 });
 
 // ==================== TOURNAMENTS ====================
 
-// Get all tournaments
+// Get all tournaments (admin endpoint - shows all including finished)
 app.get('/api/tournaments', async (req, res) => {
   try {
     if (!db) {
-      console.error('Database not available when fetching tournaments');
       return res.status(503).json({ error: 'Database not available' });
     }
     
@@ -242,7 +275,6 @@ app.get('/api/tournaments', async (req, res) => {
       const tournaments = await db.collection('tournaments').find({}).sort({ createdAt: -1 }).toArray();
       res.json(tournaments || []);
     } catch (dbError) {
-      console.error('Database error fetching tournaments:', dbError);
       // If collection doesn't exist, return empty array
       if (dbError.message && dbError.message.includes('not found')) {
         return res.json([]);
@@ -250,8 +282,6 @@ app.get('/api/tournaments', async (req, res) => {
       throw dbError;
     }
   } catch (error) {
-    console.error('Error fetching tournaments:', error);
-    console.error('Error stack:', error.stack);
     res.status(500).json({ 
       error: 'Kunde inte hämta turneringar',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -259,32 +289,40 @@ app.get('/api/tournaments', async (req, res) => {
   }
 });
 
-// Get active tournaments (includes upcoming, active, and started)
+// Get visible tournaments (includes upcoming, active, and started - excludes only finished)
+// This allows people to see and register for upcoming tournaments before they're activated
+// Uses the SAME logic as /api/tournaments but filters out "finished"
 app.get('/api/tournaments/active', async (req, res) => {
   try {
     if (!db) {
-      console.error('Database not available when fetching active tournaments');
       return res.status(503).json({ error: 'Database not available' });
     }
     
+    let allTournaments = [];
     try {
-      const tournaments = await db.collection('tournaments').find({ 
-        status: { $in: ['upcoming', 'active', 'started'] } 
-      }).sort({ startDate: 1 }).toArray();
-      res.json(tournaments || []);
-    } catch (dbError) {
-      console.error('Database error fetching active tournaments:', dbError);
-      // If collection doesn't exist, return empty array
-      if (dbError.message && dbError.message.includes('not found')) {
-        return res.json([]);
-      }
-      throw dbError;
+      allTournaments = await db.collection('tournaments').find({}).sort({ createdAt: -1 }).toArray();
+    } catch (findError) {
+      return res.json([]);
     }
+    
+    const tournaments = allTournaments.filter(t => {
+      const status = t.status || 'upcoming';
+      return status !== 'finished';
+    });
+    
+    tournaments.sort((a, b) => {
+      if (a.startDate && b.startDate) {
+        return a.startDate.localeCompare(b.startDate);
+      }
+      if (a.startDate) return -1;
+      if (b.startDate) return 1;
+      return 0;
+    });
+    
+    res.json(tournaments || []);
   } catch (error) {
-    console.error('Error fetching active tournaments:', error);
-    console.error('Error stack:', error.stack);
     res.status(500).json({ 
-      error: 'Kunde inte hämta aktiva turneringar',
+      error: 'Kunde inte hämta turneringar',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -304,7 +342,6 @@ app.get('/api/tournaments/:id', async (req, res) => {
     }
     res.json(tournament);
   } catch (error) {
-    console.error('Error fetching tournament:', error);
     res.status(500).json({ error: 'Kunde inte hämta turnering' });
   }
 });
@@ -354,11 +391,16 @@ app.post('/api/tournaments', async (req, res) => {
       updatedAt: new Date()
     };
 
+    
     const result = await db.collection('tournaments').insertOne(tournament);
     tournament._id = result.insertedId;
+    
+      insertedId: result.insertedId,
+      acknowledged: result.acknowledged
+    });
+    
     res.status(201).json(tournament);
   } catch (error) {
-    console.error('Error creating tournament:', error);
     res.status(500).json({ error: 'Kunde inte skapa turnering' });
   }
 });
@@ -390,7 +432,6 @@ app.put('/api/tournaments/:id', async (req, res) => {
     });
     res.json(tournament);
   } catch (error) {
-    console.error('Error updating tournament:', error);
     res.status(500).json({ error: 'Kunde inte uppdatera turnering' });
   }
 });
@@ -412,7 +453,6 @@ app.delete('/api/tournaments/:id', async (req, res) => {
 
     res.json({ message: 'Turnering borttagen' });
   } catch (error) {
-    console.error('Error deleting tournament:', error);
     res.status(500).json({ error: 'Kunde inte ta bort turnering' });
   }
 });
@@ -426,6 +466,31 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
 
     const { userId, email, firstName, lastName } = req.body;
     const tournamentId = req.params.id;
+
+    // Require userId - user must have an account to register
+    if (!userId) {
+      return res.status(401).json({ error: 'Du måste vara inloggad för att registrera dig till turneringen' });
+    }
+
+    // Validate that the account exists
+    let account = await db.collection('accounts').findOne({ 
+      _id: new ObjectId(userId) 
+    });
+    
+    if (!account) {
+      account = await db.collection('users').findOne({ 
+        _id: new ObjectId(userId) 
+      });
+    }
+
+    if (!account) {
+      return res.status(404).json({ error: 'Konto hittades inte. Vänligen logga in igen.' });
+    }
+
+    // Verify email matches account
+    if (account.email !== email.toLowerCase()) {
+      return res.status(400).json({ error: 'E-postadress matchar inte ditt konto' });
+    }
 
     const tournament = await db.collection('tournaments').findOne({ 
       _id: new ObjectId(tournamentId) 
@@ -445,7 +510,7 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
 
     // Check if already registered
     const alreadyRegistered = tournament.participants.some(p => 
-      (userId && p.userId && p.userId.toString() === userId) || 
+      (p.userId && p.userId.toString() === userId) || 
       p.email === email.toLowerCase()
     );
 
@@ -454,10 +519,10 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
     }
 
     const participant = {
-      userId: userId ? new ObjectId(userId) : null,
+      userId: new ObjectId(userId), // Always require userId now
       email: email.toLowerCase(),
-      firstName,
-      lastName,
+      firstName: firstName || account.firstName,
+      lastName: lastName || account.lastName,
       registeredAt: new Date(),
       wins: 0,
       losses: 0,
@@ -490,7 +555,6 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
 
     res.json({ message: 'Registrerad till turneringen!', participant });
   } catch (error) {
-    console.error('Error registering to tournament:', error);
     res.status(500).json({ error: 'Kunde inte registrera sig' });
   }
 });
@@ -576,7 +640,6 @@ app.post('/api/tournaments/:id/start', async (req, res) => {
 
     res.json({ message: 'Turnering startad!', tournament: updatedTournament });
   } catch (error) {
-    console.error('Error starting tournament:', error);
     res.status(500).json({ error: 'Kunde inte starta turnering' });
   }
 });
@@ -672,7 +735,6 @@ app.post('/api/tournaments/:id/rounds/:roundNumber/results', async (req, res) =>
 
     res.json({ message: 'Resultat uppdaterat!', tournament });
   } catch (error) {
-    console.error('Error submitting result:', error);
     res.status(500).json({ error: 'Kunde inte skicka in resultat' });
   }
 });
@@ -772,7 +834,6 @@ app.post('/api/tournaments/:id/next-round', async (req, res) => {
 
     res.json({ message: 'Nästa runda skapad!', tournament: updatedTournament });
   } catch (error) {
-    console.error('Error creating next round:', error);
     res.status(500).json({ error: 'Kunde inte skapa nästa runda' });
   }
 });
@@ -788,7 +849,6 @@ app.get('/api/tournament/registrations', async (req, res) => {
     const registrations = await db.collection('tournament_registrations').find({}).toArray();
     res.json(registrations);
   } catch (error) {
-    console.error('Error fetching registrations:', error);
     res.status(500).json({ error: 'Kunde inte hämta registreringar' });
   }
 });
@@ -844,7 +904,6 @@ app.post('/api/tournament/register', async (req, res) => {
       registration: newRegistration 
     });
   } catch (error) {
-    console.error('Error creating registration:', error);
     res.status(500).json({ 
       error: 'Kunde inte spara registreringen' 
     });
@@ -869,7 +928,6 @@ app.delete('/api/tournament/registrations/:id', async (req, res) => {
 
     res.json({ message: 'Registrering borttagen' });
   } catch (error) {
-    console.error('Error deleting registration:', error);
     res.status(500).json({ error: 'Kunde inte ta bort registreringen' });
   }
 });
@@ -915,7 +973,6 @@ app.get('/api/products', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching products:', error);
     res.status(500).json({ error: 'Kunde inte hämta produkter' });
   }
 });
@@ -937,7 +994,6 @@ app.get('/api/products/:id', async (req, res) => {
 
     res.json(product);
   } catch (error) {
-    console.error('Error fetching product:', error);
     res.status(500).json({ error: 'Kunde inte hämta produkt' });
   }
 });
@@ -994,7 +1050,6 @@ app.post('/api/products', async (req, res) => {
       product 
     });
   } catch (error) {
-    console.error('Error creating product:', error);
     res.status(500).json({ error: 'Kunde inte skapa produkt' });
   }
 });
@@ -1046,7 +1101,6 @@ app.put('/api/products/:id', async (req, res) => {
 
     res.json({ message: 'Produkt uppdaterad' });
   } catch (error) {
-    console.error('Error updating product:', error);
     res.status(500).json({ error: 'Kunde inte uppdatera produkt' });
   }
 });
@@ -1069,7 +1123,6 @@ app.delete('/api/products/:id', async (req, res) => {
 
     res.json({ message: 'Produkt borttagen' });
   } catch (error) {
-    console.error('Error deleting product:', error);
     res.status(500).json({ error: 'Kunde inte ta bort produkt' });
   }
 });
@@ -1104,7 +1157,6 @@ app.get('/api/products/categories', async (req, res) => {
     
     res.json(filteredCategories);
   } catch (error) {
-    console.error('Error fetching categories:', error);
     // Return default categories on error
     res.json([
       'Serier',
@@ -1144,7 +1196,6 @@ app.get('/api/users', async (req, res) => {
 
     res.json(accountsWithoutPasswords);
   } catch (error) {
-    console.error('Error fetching accounts:', error);
     res.status(500).json({ error: 'Kunde inte hämta konton' });
   }
 });
@@ -1201,7 +1252,6 @@ app.post('/api/users', async (req, res) => {
       user: accountWithoutPassword 
     });
   } catch (error) {
-    console.error('Error creating account:', error);
     res.status(500).json({ error: 'Kunde inte skapa konto' });
   }
 });
@@ -1240,7 +1290,6 @@ app.get('/api/orders', async (req, res) => {
 
     res.json(receipts);
   } catch (error) {
-    console.error('Error fetching receipts:', error);
     res.status(500).json({ error: 'Kunde inte hämta kvitton' });
   }
 });
@@ -1308,7 +1357,6 @@ app.post('/api/orders', async (req, res) => {
       order: receipt // For backward compatibility
     });
   } catch (error) {
-    console.error('Error creating receipt:', error);
     res.status(500).json({ error: 'Kunde inte skapa kvitto' });
   }
 });
@@ -1351,7 +1399,6 @@ app.put('/api/orders/:id/status', async (req, res) => {
 
     res.json({ message: 'Kvittostatus uppdaterad' });
   } catch (error) {
-    console.error('Error updating receipt:', error);
     res.status(500).json({ error: 'Kunde inte uppdatera kvitto' });
   }
 });
@@ -1368,11 +1415,27 @@ app.get('/api/health', async (req, res) => {
 // Test tournaments endpoint
 app.get('/api/tournaments/test', async (req, res) => {
   try {
-    res.json({
+    
+    const dbStatus = {
       dbAvailable: !!db,
       dbName: db ? db.databaseName : 'N/A',
-      collections: db ? (await db.listCollections().toArray()).map(c => c.name) : []
-    });
+      collections: []
+    };
+    
+    if (db) {
+      const collections = await db.listCollections().toArray();
+      dbStatus.collections = collections.map(c => c.name);
+      if (dbStatus.collections.includes('tournaments')) {
+        const count = await db.collection('tournaments').countDocuments();
+        
+        if (count > 0) {
+          const all = await db.collection('tournaments').find({}).toArray();
+          dbStatus.tournaments = all;
+        }
+      }
+    }
+    
+    res.json(dbStatus);
   } catch (error) {
     res.status(500).json({ 
       error: error.message,
@@ -1383,7 +1446,6 @@ app.get('/api/tournaments/test', async (req, res) => {
 
 // Error handling middleware - must be before 404 handler
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
   res.status(500).json({ 
     error: 'Internal server error',
     details: process.env.NODE_ENV === 'development' ? err.message : undefined
@@ -1401,21 +1463,13 @@ app.use('/api/*', (req, res) => {
 
 // Start server
 app.listen(PORT, async () => {
-  console.log(`🚀 Server körs på http://localhost:${PORT}`);
-  // Wait a moment for connection to establish
   await new Promise(resolve => setTimeout(resolve, 500));
-  console.log(`📊 Database: ${db ? '✅ Connected' : '❌ Not connected'}`);
-  if (db) {
-    console.log(`   Database name: ${db.databaseName}`);
-  }
 });
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('\n🛑 Stänger ner servern...');
   if (mongoClient) {
     await mongoClient.close();
-    console.log('✅ MongoDB connection closed');
   }
   process.exit(0);
 });

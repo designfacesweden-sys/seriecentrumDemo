@@ -3,48 +3,60 @@ import { useUser } from '../components/UserAuth'
 import LoginModal from '../components/LoginModal'
 import RegisterModal from '../components/RegisterModal'
 import ResultModal from '../components/ResultModal'
+import EnhancedResultModal from '../components/EnhancedResultModal'
+import LiveTournamentDashboard from '../components/LiveTournamentDashboard'
+import MatchPairingsView from '../components/MatchPairingsView'
+import PersonalMatchHighlight from '../components/PersonalMatchHighlight'
+import LiveStandings from '../components/LiveStandings'
+import PrizeShowcase from '../components/PrizeShowcase'
 
 const API_URL = '/api'
 
 const Tournament = () => {
   const { user, login, logout } = useUser()
   const [tournaments, setTournaments] = useState([])
-  const [selectedTournament, setSelectedTournament] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
   const [registeringTournament, setRegisteringTournament] = useState(null)
-  const [resultModal, setResultModal] = useState({ isOpen: false, pairing: null, roundNumber: 0, pairingIndex: 0 })
+  const [resultModal, setResultModal] = useState({ isOpen: false, pairing: null, roundNumber: 0, pairingIndex: 0, tournamentId: null })
 
   useEffect(() => {
     fetchTournaments()
+  }, [])
+
+  // Real-time updates: poll every 5 seconds for started tournaments
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchTournaments()
+    }, 5000)
+    
+    return () => clearInterval(interval)
   }, [])
 
   const fetchTournaments = async () => {
     try {
       const response = await fetch(`${API_URL}/tournaments/active`)
       
-      // Check if response is JSON
       const contentType = response.headers.get('content-type')
+      
       if (!contentType || !contentType.includes('application/json')) {
-        console.error('Server returned non-JSON response. Is the backend server running?')
         setLoading(false)
         return
       }
       
+      const data = await response.json()
+      
       if (response.ok) {
-        const data = await response.json()
-        setTournaments(data)
-        if (data.length > 0 && !selectedTournament) {
-          setSelectedTournament(data[0])
-        }
-      } else {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        console.error('Error fetching tournaments:', errorData)
+        const visibleTournaments = data.filter(t => {
+          const status = t.status || 'upcoming'
+          return status !== 'finished'
+        })
+        
+        setTournaments(visibleTournaments)
       }
     } catch (error) {
-      console.error('Error fetching tournaments:', error)
-      console.error('Make sure the backend server is running on port 3000')
+      // Silent error handling
     } finally {
       setLoading(false)
     }
@@ -74,10 +86,6 @@ const Tournament = () => {
       if (response.ok) {
         alert('Registrerad till turneringen!')
         fetchTournaments()
-        if (selectedTournament?._id === tournamentId) {
-          const updated = await fetch(`${API_URL}/tournaments/${tournamentId}`).then(r => r.json())
-          setSelectedTournament(updated)
-        }
       } else {
         alert(data.error || 'Kunde inte registrera sig')
       }
@@ -164,7 +172,8 @@ const Tournament = () => {
                               isOpen: true,
                               pairing,
                               roundNumber: round.roundNumber,
-                              pairingIndex
+                              pairingIndex,
+                              tournamentId: tournament._id
                             })
                           }}
                         >
@@ -243,98 +252,138 @@ const Tournament = () => {
             <p>Inga aktiva turneringar för tillfället. Kolla tillbaka snart!</p>
           </div>
         ) : (
-          <div className="tournaments-layout">
-            <div className="tournaments-list">
-              <h2>Aktiva turneringar</h2>
-              {tournaments.map((tournament) => (
-                <div
-                  key={tournament._id}
-                  className={`tournament-card ${selectedTournament?._id === tournament._id ? 'active' : ''}`}
-                  onClick={() => setSelectedTournament(tournament)}
-                >
-                  <h3>{tournament.name}</h3>
-                  <p>{tournament.startDate} {tournament.startTime}</p>
-                  <p>{tournament.format}</p>
-                  <p>{tournament.participants?.length || 0} / {tournament.maxPlayers} deltagare</p>
+          <div className="tournaments-list-container">
+            {tournaments.map((tournament) => (
+              <div key={tournament._id} className="tournament-list-item">
+                <div className="tournament-list-header">
+                  <h2>{tournament.name}</h2>
+                  <span className={`tournament-status-badge status-${tournament.status}`}>
+                    {tournament.status === 'upcoming' ? 'Kommande' : 
+                     tournament.status === 'active' ? 'Aktiv' : 
+                     tournament.status === 'started' ? 'Pågår' : 
+                     tournament.status || 'Kommande'}
+                  </span>
                 </div>
-              ))}
-            </div>
 
-            {selectedTournament && (
-              <div className="tournament-details">
-                <div className="tournament-hero">
-                  <h2>{selectedTournament.name}</h2>
-                  <div className="tournament-info-grid">
-                    <div className="tournament-info-item">
-                      <strong>Datum:</strong> {selectedTournament.startDate} {selectedTournament.startTime}
+                <div className="tournament-list-info">
+                  <div className="tournament-list-info-row">
+                    <div className="tournament-list-info-item">
+                      <strong>Datum:</strong> {tournament.startDate} {tournament.startTime}
                     </div>
-                    <div className="tournament-info-item">
-                      <strong>Plats:</strong> {selectedTournament.location}
+                    <div className="tournament-list-info-item">
+                      <strong>Plats:</strong> {tournament.location}
                     </div>
-                    <div className="tournament-info-item">
-                      <strong>Format:</strong> {selectedTournament.format}
+                    <div className="tournament-list-info-item">
+                      <strong>Format:</strong> {tournament.format}
                     </div>
-                    <div className="tournament-info-item">
-                      <strong>Kostnad:</strong> {selectedTournament.cost} kr
+                    <div className="tournament-list-info-item">
+                      <strong>Kostnad:</strong> {tournament.cost} kr
                     </div>
-                    <div className="tournament-info-item">
-                      <strong>Tid per runda:</strong> {selectedTournament.timePerRound} minuter
+                    <div className="tournament-list-info-item">
+                      <strong>Tid per runda:</strong> {tournament.timePerRound} minuter
                     </div>
-                    <div className="tournament-info-item">
-                      <strong>Deltagare:</strong> {selectedTournament.participants?.length || 0} / {selectedTournament.maxPlayers}
+                    <div className="tournament-list-info-item">
+                      <strong>Deltagare:</strong> {tournament.participants?.length || 0} / {tournament.maxPlayers}
                     </div>
                   </div>
+                </div>
 
-                  {selectedTournament.description && (
-                    <div className="tournament-description">
-                      <p>{selectedTournament.description}</p>
-                    </div>
-                  )}
+                {tournament.description && (
+                  <div className="tournament-list-description">
+                    <p>{tournament.description}</p>
+                  </div>
+                )}
 
-                  {selectedTournament.rules && (
-                    <div className="tournament-rules">
-                      <h3>Regler</h3>
-                      <p>{selectedTournament.rules}</p>
-                    </div>
-                  )}
+                <div className="tournament-list-content">
+                  <div className="tournament-list-section">
+                    {tournament.rules && (
+                      <div className="tournament-list-rules">
+                        <h3>Regler</h3>
+                        <p>{tournament.rules}</p>
+                      </div>
+                    )}
 
-                  {selectedTournament.prizes && selectedTournament.prizes.length > 0 && (
-                    <div className="tournament-prizes">
-                      <h3>Priser</h3>
-                      <ul>
-                        {selectedTournament.prizes.map((prize, index) => (
-                          <li key={index}>
-                            <strong>{prize.position}:</strong> {prize.prize}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                    {tournament.prizes && tournament.prizes.length > 0 && (
+                      <div className="tournament-list-prizes">
+                        <h3>Priser</h3>
+                        <ul>
+                          {tournament.prizes.map((prize, index) => (
+                            <li key={index}>
+                              <strong>{prize.position}:</strong> {prize.prize}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                  {(selectedTournament.status === 'upcoming' || selectedTournament.status === 'active') && (
-                    <div className="tournament-register-section">
-                      {isRegistered(selectedTournament) ? (
-                        <p className="registered-badge">Du är redan registrerad!</p>
-                      ) : (
+                {(tournament.status === 'upcoming' || tournament.status === 'active') && (
+                  <div className="tournament-list-register">
+                    {isRegistered(tournament) ? (
+                      <p className="registered-badge">Du är redan registrerad!</p>
+                    ) : (
+                      <div className="tournament-register-actions">
+                        {!user && (
+                          <p className="register-info-text">
+                            Logga in eller skapa konto för att registrera dig till turneringen
+                          </p>
+                        )}
                         <button
                           className="register-button-large"
-                          onClick={() => handleRegister(selectedTournament._id)}
+                          onClick={() => handleRegister(tournament._id)}
                         >
-                          REGISTRERA DIG NU
+                          {user ? 'REGISTRERA DIG NU' : 'LOGGA IN FÖR ATT REGISTRERA DIG'}
                         </button>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                  {selectedTournament.status === 'started' && (
-                    <>
-                      {renderTournamentSchedule(selectedTournament)}
-                      {renderStandings(selectedTournament)}
-                    </>
-                  )}
-                </div>
+                {tournament.status === 'started' && (
+                  <div className="tournament-live-view">
+                    <LiveTournamentDashboard tournament={tournament} user={user} />
+                    
+                    <PersonalMatchHighlight
+                      tournament={tournament}
+                      user={user}
+                      onResultSubmit={(pairing, roundNumber, pairingIndex) => {
+                        setResultModal({
+                          isOpen: true,
+                          pairing,
+                          roundNumber,
+                          pairingIndex,
+                          tournamentId: tournament._id
+                        })
+                      }}
+                    />
+                    
+                    <MatchPairingsView
+                      tournament={tournament}
+                      user={user}
+                      onResultSubmit={(pairing, roundNumber, pairingIndex) => {
+                        setResultModal({
+                          isOpen: true,
+                          pairing,
+                          roundNumber,
+                          pairingIndex,
+                          tournamentId: tournament._id
+                        })
+                      }}
+                    />
+                    
+                    <div className="tournament-live-sections">
+                      <div className="live-section-left">
+                        <LiveStandings tournament={tournament} />
+                      </div>
+                      <div className="live-section-right">
+                        <PrizeShowcase tournament={tournament} />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
         )}
 
@@ -364,20 +413,15 @@ const Tournament = () => {
           }}
         />
 
-        <ResultModal
+        <EnhancedResultModal
           isOpen={resultModal.isOpen}
-          onClose={() => setResultModal({ isOpen: false, pairing: null, roundNumber: 0, pairingIndex: 0 })}
-          tournament={selectedTournament}
+          onClose={() => setResultModal({ isOpen: false, pairing: null, roundNumber: 0, pairingIndex: 0, tournamentId: null })}
+          tournament={resultModal.tournamentId ? tournaments.find(t => t._id === resultModal.tournamentId) : null}
           roundNumber={resultModal.roundNumber}
           pairing={resultModal.pairing}
           pairingIndex={resultModal.pairingIndex}
           onResultSubmitted={() => {
             fetchTournaments()
-            if (selectedTournament) {
-              fetch(`${API_URL}/tournaments/${selectedTournament._id}`)
-                .then(r => r.json())
-                .then(data => setSelectedTournament(data))
-            }
           }}
         />
       </div>

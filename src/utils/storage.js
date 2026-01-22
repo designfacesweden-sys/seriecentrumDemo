@@ -7,7 +7,7 @@ export const getRegistrations = () => {
     const data = localStorage.getItem(STORAGE_KEY)
     return data ? JSON.parse(data) : []
   } catch (error) {
-    console.error('Error reading registrations:', error)
+    // Error reading registrations
     return []
   }
 }
@@ -46,7 +46,7 @@ export const deleteRegistration = (id) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered))
     return true
   } catch (error) {
-    console.error('Error deleting registration:', error)
+    // Error deleting registration
     return false
   }
 }

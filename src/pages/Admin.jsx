@@ -20,7 +20,7 @@ const Admin = () => {
         setRegistrations(data)
       }
     } catch (err) {
-      console.error('Error loading registrations:', err)
+      // Error loading registrations
     } finally {
       setLoading(false)
     }
@@ -41,7 +41,7 @@ const Admin = () => {
         alert('Kunde inte ta bort registreringen')
       }
     } catch (error) {
-      console.error('Error deleting registration:', error)
+      // Error deleting registration
       alert('Kunde inte ta bort registreringen')
     }
   }

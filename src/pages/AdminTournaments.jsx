@@ -43,25 +43,23 @@ const AdminTournaments = () => {
     try {
       const response = await fetch(`${API_URL}/tournaments`)
       
-      // Check if response is JSON
       const contentType = response.headers.get('content-type')
+      
       if (!contentType || !contentType.includes('application/json')) {
-        console.error('Server returned non-JSON response. Is the backend server running?')
         setError('Backend-servern körs inte. Starta servern med "npm run server"')
         setLoading(false)
         return
       }
       
+      const data = await response.json()
+      
       if (response.ok) {
-        const data = await response.json()
         setTournaments(data)
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
         setError(errorData.error || 'Kunde inte hämta turneringar')
-        console.error('Error fetching tournaments:', errorData)
       }
     } catch (error) {
-      console.error('Error fetching tournaments:', error)
       setError('Kunde inte ansluta till servern. Kontrollera att backend-servern körs.')
     } finally {
       setLoading(false)
@@ -154,6 +152,7 @@ const AdminTournaments = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
     setError('')
     setLoading(true)
 
@@ -163,16 +162,20 @@ const AdminTournaments = () => {
         : `${API_URL}/tournaments`
       const method = editingTournament ? 'PUT' : 'POST'
 
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
 
+
       if (!response.ok) {
         const data = await response.json()
         throw new Error(data.error || 'Kunde inte spara turnering')
       }
+
+      const responseData = await response.json()
 
       await fetchTournaments()
       handleCloseModal()
@@ -197,7 +200,7 @@ const AdminTournaments = () => {
         await fetchTournaments()
       }
     } catch (error) {
-      console.error('Error deleting tournament:', error)
+      // Silent error handling
     }
   }
 
@@ -207,7 +210,8 @@ const AdminTournaments = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/tournaments/${id}/start`, {
+      const url = `${API_URL}/tournaments/${id}/start`
+      const response = await fetch(url, {
         method: 'POST'
       })
 
@@ -224,7 +228,6 @@ const AdminTournaments = () => {
         }
       }
     } catch (error) {
-      console.error('Error starting tournament:', error)
       alert('Kunde inte starta turnering')
     }
   }
@@ -260,9 +263,15 @@ const AdminTournaments = () => {
         </div>
 
         {loading && tournaments.length === 0 ? (
-          <p>Laddar...</p>
+          <div className="admin-empty">
+            <p>Laddar...</p>
+          </div>
         ) : tournaments.length === 0 ? (
-          <p>Inga turneringar ännu. Skapa din första turnering!</p>
+          <div className="admin-empty">
+            <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🏆</div>
+            <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 600 }}>Inga turneringar ännu</p>
+            <p style={{ fontSize: '0.95rem', opacity: 0.7 }}>Skapa din första turnering för att komma igång</p>
+          </div>
         ) : (
           <div className="admin-tournaments-grid">
             {tournaments.map((tournament) => (

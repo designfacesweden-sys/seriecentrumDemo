@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import TournamentWidget from '../components/TournamentWidget'
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(4) // Start with slide 5 (index 4)
@@ -94,6 +95,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Tournament Widget */}
+      <TournamentWidget />
 
       {/* About Section */}
       <section className="about-section">

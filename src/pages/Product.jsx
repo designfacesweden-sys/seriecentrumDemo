@@ -51,7 +51,7 @@ const Product = () => {
             try {
               availableConditions = JSON.parse(decodeURIComponent(availableConditionsParam))
             } catch (e) {
-              console.error('Error parsing available conditions:', e)
+              // Error parsing available conditions
             }
           }
 
@@ -94,7 +94,7 @@ const Product = () => {
         setLoading(false)
       })
       .catch(error => {
-        console.error('Error loading products:', error)
+        // Error loading products
         setLoading(false)
       })
   }, [productName, originalUrl, productPrice, productCategory, availableConditionsParam])
