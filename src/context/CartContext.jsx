@@ -60,7 +60,12 @@ export const CartProvider = ({ children }) => {
 
   const getTotalPrice = () => {
     return cart.reduce((total, item) => {
-      const price = parseInt(item.price.replace(/[^\d]/g, '')) || 0
+      let price = 0
+      if (typeof item.price === 'number') {
+        price = item.price
+      } else if (typeof item.price === 'string') {
+        price = parseInt(item.price.replace(/[^\d]/g, '')) || 0
+      }
       return total + (price * item.quantity)
     }, 0)
   }

@@ -19,90 +19,163 @@ const Product = () => {
   const availableConditionsParam = searchParams.get('available_conditions')
 
   useEffect(() => {
-    fetch('/products.json')
-      .then(response => response.json())
-      .then(products => {
-        let foundProduct = null
-
-        if (originalUrl) {
-          foundProduct = products.find(p => p.url === decodeURIComponent(originalUrl))
-        }
-
-        if (!foundProduct && productName) {
-          // Find product by name (should be unique after deduplication)
-          foundProduct = products.find(p => (p.name || '').trim() === productName.trim())
+    // First try to load from database API
+    const loadFromAPI = async () => {
+      try {
+        const response = await fetch(`/api/products?search=${encodeURIComponent(productName)}&limit=100`)
+        if (response.ok) {
+          const data = await response.json()
+          const foundProduct = data.products?.find(p => 
+            (p.name || '').trim() === productName.trim()
+          )
           
-          // If still not found, try to find any product with similar name
-          if (!foundProduct) {
-            foundProduct = products.find(p => 
-              (p.name || '').toLowerCase().trim() === productName.toLowerCase().trim()
-            )
-          }
-        }
-
-        if (foundProduct) {
-          setProduct(foundProduct)
-          
-          // Get available conditions
-          let availableConditions = []
-          if (foundProduct.available_conditions && foundProduct.available_conditions.length > 0) {
-            availableConditions = foundProduct.available_conditions
-          } else if (availableConditionsParam) {
-            try {
-              availableConditions = JSON.parse(decodeURIComponent(availableConditionsParam))
-            } catch (e) {
-              // Error parsing available conditions
-            }
-          }
-
-          // Set default condition (first available one)
-          if (availableConditions.length > 0) {
-            // Filter to only available conditions (availability > 0)
-            const available = availableConditions.filter(cond => {
-              const avail = typeof cond === 'object' ? cond.availability : cond
-              if (typeof avail === 'string') {
-                const lower = avail.toLowerCase()
-                return !lower.includes('ej') && !lower.includes('slut') && lower !== '0'
-              }
-              return parseInt(avail || '0') > 0
-            })
+          if (foundProduct) {
+            setProduct(foundProduct)
             
-            if (available.length > 0) {
-              const defaultCond = typeof available[0] === 'object' ? available[0].condition : available[0]
-              const defaultData = typeof available[0] === 'object' ? available[0] : null
-              setSelectedCondition(defaultCond)
-              setSelectedConditionData(defaultData)
-            } else if (availableConditions.length > 0) {
-              // All are unavailable, but still allow selection
-              const first = availableConditions[0]
-              const firstCond = typeof first === 'object' ? first.condition : first
-              const firstData = typeof first === 'object' ? first : null
-              setSelectedCondition(firstCond)
-              setSelectedConditionData(firstData)
+            // Get available conditions from product or URL params
+            let availableConditions = []
+            if (foundProduct.availableConditions && foundProduct.availableConditions.length > 0) {
+              availableConditions = foundProduct.availableConditions
+            } else if (availableConditionsParam) {
+              try {
+                availableConditions = JSON.parse(decodeURIComponent(availableConditionsParam))
+              } catch (e) {
+                // Error parsing available conditions
+              }
             }
+            
+            // Set default condition (first available one)
+            if (availableConditions.length > 0) {
+              // Filter to only available conditions (availability > 0)
+              const available = availableConditions.filter(cond => {
+                const avail = typeof cond === 'object' ? cond.availability : cond
+                if (typeof avail === 'string') {
+                  const lower = avail.toLowerCase()
+                  return !lower.includes('ej') && !lower.includes('slut') && lower !== '0'
+                }
+                return parseInt(avail || '0') > 0
+              })
+              
+              if (available.length > 0) {
+                const defaultCond = typeof available[0] === 'object' ? available[0].condition : available[0]
+                const defaultData = typeof available[0] === 'object' ? available[0] : null
+                setSelectedCondition(defaultCond)
+                setSelectedConditionData(defaultData)
+              } else if (availableConditions.length > 0) {
+                // All are unavailable, but still allow selection
+                const first = availableConditions[0]
+                const firstCond = typeof first === 'object' ? first.condition : first
+                const firstData = typeof first === 'object' ? first : null
+                setSelectedCondition(firstCond)
+                setSelectedConditionData(firstData)
+              }
+            }
+            setLoading(false)
+            return true
           }
-        } else {
-          // Fallback to URL params
-          setProduct({
-            name: productName,
-            price: productPrice ? `${productPrice} kr` : '0',
-            category: productCategory || 'all',
-            images: [],
-            description: 'Ingen beskrivning tillgänglig för denna produkt.'
-          })
         }
-        setLoading(false)
-      })
-      .catch(error => {
-        // Error loading products
-        setLoading(false)
-      })
+      } catch (error) {
+        // API not available, continue to fallback
+      }
+      return false
+    }
+    
+    // Try API first, then fallback to products.json
+    loadFromAPI().then(loadedFromAPI => {
+      if (!loadedFromAPI) {
+        // Fallback to products.json
+        fetch('/products.json')
+          .then(response => response.json())
+          .then(products => {
+            let foundProduct = null
+
+            if (originalUrl) {
+              foundProduct = products.find(p => p.url === decodeURIComponent(originalUrl))
+            }
+
+            if (!foundProduct && productName) {
+              // Find product by name (should be unique after deduplication)
+              foundProduct = products.find(p => (p.name || '').trim() === productName.trim())
+              
+              // If still not found, try to find any product with similar name
+              if (!foundProduct) {
+                foundProduct = products.find(p => 
+                  (p.name || '').toLowerCase().trim() === productName.toLowerCase().trim()
+                )
+              }
+            }
+
+            if (foundProduct) {
+              setProduct(foundProduct)
+              
+              // Get available conditions
+              let availableConditions = []
+              if (foundProduct.available_conditions && foundProduct.available_conditions.length > 0) {
+                availableConditions = foundProduct.available_conditions
+              } else if (availableConditionsParam) {
+                try {
+                  availableConditions = JSON.parse(decodeURIComponent(availableConditionsParam))
+                } catch (e) {
+                  // Error parsing available conditions
+                }
+              }
+
+              // Set default condition (first available one)
+              if (availableConditions.length > 0) {
+                // Filter to only available conditions (availability > 0)
+                const available = availableConditions.filter(cond => {
+                  const avail = typeof cond === 'object' ? cond.availability : cond
+                  if (typeof avail === 'string') {
+                    const lower = avail.toLowerCase()
+                    return !lower.includes('ej') && !lower.includes('slut') && lower !== '0'
+                  }
+                  return parseInt(avail || '0') > 0
+                })
+                
+                if (available.length > 0) {
+                  const defaultCond = typeof available[0] === 'object' ? available[0].condition : available[0]
+                  const defaultData = typeof available[0] === 'object' ? available[0] : null
+                  setSelectedCondition(defaultCond)
+                  setSelectedConditionData(defaultData)
+                } else if (availableConditions.length > 0) {
+                  // All are unavailable, but still allow selection
+                  const first = availableConditions[0]
+                  const firstCond = typeof first === 'object' ? first.condition : first
+                  const firstData = typeof first === 'object' ? first : null
+                  setSelectedCondition(firstCond)
+                  setSelectedConditionData(firstData)
+                }
+              }
+            } else {
+              // Fallback to URL params
+              setProduct({
+                name: productName,
+                price: productPrice ? `${productPrice} kr` : '0',
+                category: productCategory || 'all',
+                images: [],
+                description: 'Ingen beskrivning tillgänglig för denna produkt.'
+              })
+            }
+            setLoading(false)
+          })
+          .catch(error => {
+            // Error loading products
+            setLoading(false)
+          })
+      }
+    })
   }, [productName, originalUrl, productPrice, productCategory, availableConditionsParam])
 
   const getAvailableConditions = () => {
+    // Check database format (camelCase) first
+    if (product?.availableConditions && product.availableConditions.length > 0) {
+      return product.availableConditions
+    }
+    // Check products.json format (snake_case)
     if (product?.available_conditions && product.available_conditions.length > 0) {
       return product.available_conditions
     }
+    // Check URL params (from Shop page)
     if (availableConditionsParam) {
       try {
         return JSON.parse(decodeURIComponent(availableConditionsParam))
@@ -117,7 +190,8 @@ const Product = () => {
     if (typeof conditionData === 'string') {
       return true // Fallback for old format
     }
-    const avail = conditionData.availability || '0'
+    // Check both 'stock' (database format) and 'availability' (products.json format)
+    const avail = conditionData.stock !== undefined ? conditionData.stock : (conditionData.availability || '0')
     if (typeof avail === 'string') {
       const lower = avail.toLowerCase()
       return !lower.includes('ej') && !lower.includes('slut') && lower !== '0'
@@ -143,20 +217,34 @@ const Product = () => {
   }
 
   const handleAddToCart = () => {
-    if (!selectedCondition || !product) return
+    if (!product) return
+    
+    // Get available conditions
+    const availableConditions = getAvailableConditions()
+    
+    // If product has conditions, require one to be selected
+    if (availableConditions.length > 0 && !selectedCondition) return
     
     // Use price from selected condition if available
     const priceToUse = selectedConditionData?.price || product.price || productPrice || '0'
-    const finalPrice = typeof priceToUse === 'string' && !priceToUse.includes('kr') 
-      ? `${priceToUse} kr` 
-      : priceToUse
+    // Normalize price to string format for cart
+    let finalPrice = ''
+    if (typeof priceToUse === 'number') {
+      finalPrice = `${priceToUse} kr`
+    } else if (typeof priceToUse === 'string') {
+      finalPrice = priceToUse.includes('kr') || priceToUse.includes('Kr') 
+        ? priceToUse 
+        : `${priceToUse} kr`
+    } else {
+      finalPrice = '0 kr'
+    }
 
     addToCart({
       name: product.name,
       price: finalPrice,
-      condition: selectedCondition,
+      condition: selectedCondition || null,
       category: product.category || productCategory || 'all',
-      image: product.images?.[0] || null
+      image: product.images?.[0] || product.image || null
     })
 
     setAddToCartText('Tillagd produkt')
@@ -188,10 +276,18 @@ const Product = () => {
   const availableConditions = getAvailableConditions()
   // Use price from selected condition if available, otherwise use product price
   const price = selectedConditionData?.price || product.price || (productPrice ? `${productPrice} kr` : '0')
-  const finalPrice = typeof price === 'string' && !price.includes('kr') && !price.includes('Kr') 
-    ? `${price}${price.includes('kr') || price.includes('Kr') ? '' : ' kr'}` 
-    : price
-  const hasImage = product.images && product.images.length > 0
+  // Normalize price to always include "kr"
+  let finalPrice = ''
+  if (typeof price === 'number') {
+    finalPrice = `${price} kr`
+  } else if (typeof price === 'string') {
+    finalPrice = price.includes('kr') || price.includes('Kr') 
+      ? price 
+      : `${price} kr`
+  } else {
+    finalPrice = '0 kr'
+  }
+  const hasImage = (product.images && product.images.length > 0) || product.image
 
   return (
     <section className="page-section product-detail-section">
@@ -200,13 +296,21 @@ const Product = () => {
           <div className="product-detail-image">
             {hasImage ? (
               <img
-                src={product.images[0]}
+                src={product.images?.[0] || product.image}
                 alt={product.name}
                 style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                  e.target.nextSibling.style.display = 'flex'
+                }}
               />
-            ) : (
-              <div className="product-image-placeholder-large">📦</div>
-            )}
+            ) : null}
+            <div 
+              className="product-image-placeholder-large" 
+              style={{ display: hasImage ? 'none' : 'flex' }}
+            >
+              📦
+            </div>
           </div>
           <div className="product-detail-info">
             <h1 className="product-detail-title">{product.name}</h1>
@@ -238,7 +342,10 @@ const Product = () => {
                       {availableConditions.map((conditionData, index) => {
                       const condition = typeof conditionData === 'object' ? conditionData.condition : conditionData
                       const conditionPrice = typeof conditionData === 'object' ? conditionData.price : null
-                      const conditionAvailability = typeof conditionData === 'object' ? conditionData.availability : null
+                      // Check both 'stock' (database format) and 'availability' (products.json format)
+                      const conditionAvailability = typeof conditionData === 'object' 
+                        ? (conditionData.stock !== undefined ? conditionData.stock : conditionData.availability)
+                        : null
                       const isAvailable = isConditionAvailable(conditionData)
                       const isSelected = selectedCondition === condition
                       
@@ -274,7 +381,11 @@ const Product = () => {
                           </div>
                           {conditionPrice && (
                             <span style={{ marginLeft: '1rem', fontWeight: 700, color: '#ffffff', fontSize: '1rem' }}>
-                              {conditionPrice}
+                              {typeof conditionPrice === 'number' 
+                                ? `${conditionPrice} kr` 
+                                : (conditionPrice.includes('kr') || conditionPrice.includes('Kr') 
+                                  ? conditionPrice 
+                                  : `${conditionPrice} kr`)}
                             </span>
                           )}
                         </div>
@@ -310,7 +421,10 @@ const Product = () => {
               <button
                 className="add-to-cart-btn-large"
                 onClick={handleAddToCart}
-                disabled={!selectedCondition || (selectedConditionData && !isConditionAvailable(selectedConditionData))}
+                disabled={
+                  (availableConditions.length > 0 && !selectedCondition) || 
+                  (selectedConditionData && !isConditionAvailable(selectedConditionData))
+                }
               >
                 {addToCartText}
               </button>

@@ -353,15 +353,23 @@ const Shop = () => {
                   className="product-image-wrapper"
                   style={{ textDecoration: 'none', display: 'block' }}
                 >
-                  {product.images && product.images[0] ? (
+                  {product.image ? (
                     <img
-                      src={product.images[0]}
+                      src={product.image}
                       alt={product.name || 'Produkt'}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.target.style.display = 'none'
+                        e.target.nextSibling.style.display = 'flex'
+                      }}
                     />
-                  ) : (
-                    <div className="product-image-placeholder">📦</div>
-                  )}
+                  ) : null}
+                  <div 
+                    className="product-image-placeholder" 
+                    style={{ display: product.image ? 'none' : 'flex' }}
+                  >
+                    📦
+                  </div>
                 </Link>
                 <div className="product-card-content">
                   <h3 style={{ cursor: 'default', textDecoration: 'none' }}>{product.name || 'Produkt utan namn'}</h3>
@@ -377,7 +385,6 @@ const Shop = () => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="pagination-container">
-            <div className="pagination-info">{productsPerPage}Kr</div>
             <div className="pagination">
               {currentPage > 1 ? (
                 <button

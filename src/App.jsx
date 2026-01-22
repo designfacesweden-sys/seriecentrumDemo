@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { CartProvider } from './context/CartContext'
 import { UserProvider } from './components/UserAuth'
 import Navbar from './components/Navbar'
@@ -9,6 +10,7 @@ import Product from './pages/Product'
 import Contact from './pages/Contact'
 import FAQ from './pages/FAQ'
 import Tournament from './pages/TournamentNew'
+import Checkout from './pages/Checkout'
 import Admin from './pages/Admin'
 import AdminTournaments from './pages/AdminTournaments'
 import AdminDashboard from './pages/AdminDashboard'
@@ -32,6 +34,11 @@ function AdminLoginWrapper() {
 function AppContent() {
   const location = useLocation()
   const isAdminPage = location.pathname.startsWith('/admin')
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [location.pathname])
 
   return (
     <div className="app">
@@ -94,7 +101,7 @@ function AppContent() {
                   </ProtectedRoute>
                 } 
               />
-          <Route path="/checkout" element={<div className="page-section"><div className="page-container"><h1>Checkout</h1><p>Checkout-sidan kommer snart...</p></div></div>} />
+          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </main>
       {!isAdminPage && <Footer />}
