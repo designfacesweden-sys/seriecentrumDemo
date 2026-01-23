@@ -18,7 +18,6 @@ const AdminTournaments = () => {
     cost: 395,
     format: 'Sealed',
     maxPlayers: 24,
-    rules: '',
     timePerRound: 50,
     prizes: []
   })
@@ -79,7 +78,6 @@ const AdminTournaments = () => {
         cost: tournament.cost || 0,
         format: tournament.format || 'Sealed',
         maxPlayers: tournament.maxPlayers || 24,
-        rules: tournament.rules || '',
         timePerRound: tournament.timePerRound || 50,
         prizes: prizes
       })
@@ -101,7 +99,6 @@ const AdminTournaments = () => {
         cost: 395,
         format: 'Sealed',
         maxPlayers: 24,
-        rules: '',
         timePerRound: 50,
         prizes: []
       })
@@ -472,17 +469,6 @@ const AdminTournaments = () => {
                       step="5"
                     />
                   </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Regler</label>
-                  <textarea
-                    name="rules"
-                    value={formData.rules}
-                    onChange={handleChange}
-                    rows="4"
-                    placeholder="Turneringsregler och information..."
-                  />
                 </div>
 
                 <div className="form-group">

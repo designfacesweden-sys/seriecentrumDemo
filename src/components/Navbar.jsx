@@ -94,7 +94,7 @@ const Navbar = () => {
                 <Link to="/fnm-turneringar" className="nav-link" onClick={closeMobileMenu}>FNM & Turneringar</Link>
               </li>
               <li className="nav-item">
-                <Link to="/om-oss" className="nav-link" onClick={closeMobileMenu}>Om oss</Link>
+                <Link to="/besok-oss" className="nav-link" onClick={closeMobileMenu}>Besök oss</Link>
               </li>
               <li className="nav-item">
                 <Link to="/kontakta-oss" className="nav-link" onClick={closeMobileMenu}>Kontakta Oss</Link>

@@ -1043,8 +1043,13 @@ app.get('/api/products', async (req, res) => {
     if (category && category !== 'all') {
       query.category = category;
     }
-    if (search) {
-      query.$text = { $search: search };
+    if (search && search.trim() !== '') {
+      // Use regex search for case-insensitive matching on name and description
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } }
+      ];
     }
 
     const products = await db.collection('products')

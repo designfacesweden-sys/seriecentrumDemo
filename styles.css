@@ -3485,6 +3485,83 @@ img {
     margin-bottom: 0;
 }
 
+.visit-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.visit-address h3,
+.visit-hours h3 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+}
+
+.visit-address p,
+.visit-hours p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0.5rem 0;
+}
+
+.visit-map {
+    margin: 2rem 0;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.visit-map iframe {
+    width: 100%;
+    height: 400px;
+    border: 0;
+    border-radius: 12px;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .visit-info {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .visit-map iframe {
+        height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .visit-info {
+        padding: 1.25rem;
+        gap: 1.25rem;
+    }
+
+    .visit-address h3,
+    .visit-hours h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .visit-address p,
+    .visit-hours p {
+        font-size: 0.95rem;
+    }
+
+    .visit-map iframe {
+        height: 250px;
+    }
+}
+
 
 /* Footer */
 .footer {
@@ -7875,6 +7952,116 @@ img, video, iframe, embed, object {
     color: rgba(255, 255, 255, 0.9);
 }
 
+.product-row.expanded {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.product-edit-row {
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.product-edit-cell {
+    padding: 0 !important;
+    border: none !important;
+}
+
+.product-edit-form {
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin: 0.5rem 0;
+}
+
+.product-edit-title {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.product-edit-form .admin-form {
+    gap: 1rem;
+}
+
+.product-edit-form .form-group {
+    margin-bottom: 0;
+}
+
+.product-edit-form .form-group label {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-edit-form .form-group input,
+.product-edit-form .form-group textarea,
+.product-edit-form .form-group select {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.85rem;
+}
+
+.product-edit-form .form-group textarea {
+    rows: 2;
+    min-height: 60px;
+}
+
+.form-row-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.product-edit-form .conditions-list {
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.product-edit-form .condition-row {
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.product-edit-form .condition-input {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.product-edit-form .add-condition-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.product-edit-form .form-actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    gap: 0.75rem;
+}
+
+.product-edit-form .cancel-btn,
+.product-edit-form .submit-btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .form-row-inline {
+        grid-template-columns: 1fr;
+    }
+    
+    .product-edit-form {
+        padding: 1rem;
+    }
+    
+    .product-edit-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+    }
+}
+
 .col-image {
     width: 60px;
 }
@@ -8525,51 +8712,36 @@ img, video, iframe, embed, object {
     }
 }
 
-.cancel-btn {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    font-family: 'Inter', sans-serif;
-}
-
-.cancel-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.25);
-}
-
+.cancel-btn,
 .submit-btn {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    font-family: 'Inter', sans-serif;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    font-family: 'Inter', sans-serif !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
 }
 
+.cancel-btn:hover,
 .submit-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: rgba(255, 255, 255, 1) !important;
+    transform: translateY(-1px) !important;
 }
 
 .submit-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
 }
 
 @media (max-width: 768px) {
@@ -10004,6 +10176,10 @@ img, video, iframe, embed, object {
 
 .tournament-list-item {
     background: rgba(255, 255, 255, 0.03);
+    background-image: url('/images/banner1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 2rem;
@@ -10011,12 +10187,34 @@ img, video, iframe, embed, object {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.tournament-list-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 0;
+    border-radius: 16px;
+}
+
+.tournament-list-item > * {
+    position: relative;
+    z-index: 1;
 }
 
 .tournament-list-item:hover {
-    background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tournament-list-item:hover::before {
+    background: rgba(0, 0, 0, 0.65);
 }
 
 .tournament-list-header {
@@ -10109,25 +10307,17 @@ img, video, iframe, embed, object {
     box-sizing: border-box;
 }
 
-.tournament-list-rules,
 .tournament-list-prizes {
     padding: 1.5rem;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
 }
 
-.tournament-list-rules h3,
 .tournament-list-prizes h3 {
     color: #ffffff;
     margin: 0 0 1rem 0;
     font-size: 1.25rem;
     font-weight: 600;
-}
-
-.tournament-list-rules p {
-    color: rgba(255, 255, 255, 0.85);
-    line-height: 1.7;
-    margin: 0;
 }
 
 .tournament-list-prizes ul {
@@ -10699,7 +10889,6 @@ img, video, iframe, embed, object {
         box-sizing: border-box;
     }
     
-    .tournament-list-rules,
     .tournament-list-prizes {
         padding: 1rem;
         word-wrap: break-word;
@@ -10816,6 +11005,10 @@ img, video, iframe, embed, object {
 
 .tournament-widget-card {
     background: rgba(255, 255, 255, 0.05);
+    background-image: url('/images/banner1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -10825,13 +11018,35 @@ img, video, iframe, embed, object {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.tournament-widget-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 0;
+    border-radius: 16px;
+}
+
+.tournament-widget-card > * {
+    position: relative;
+    z-index: 1;
 }
 
 .tournament-widget-card:hover {
-    background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-4px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.tournament-widget-card:hover::before {
+    background: rgba(0, 0, 0, 0.65);
 }
 
 .tournament-widget-card-header {

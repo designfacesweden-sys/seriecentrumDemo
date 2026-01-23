@@ -16,6 +16,7 @@ const AdminProducts = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [expandedProductId, setExpandedProductId] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -109,6 +110,13 @@ const AdminProducts = () => {
 
   const handleOpenModal = (product = null) => {
     if (product) {
+      // For editing, use inline expansion instead of modal
+      if (expandedProductId === product._id) {
+        setExpandedProductId(null)
+        setEditingProduct(null)
+        return
+      }
+      setExpandedProductId(product._id)
       setEditingProduct(product._id)
       setFormData({
         name: product.name || '',
@@ -134,6 +142,7 @@ const AdminProducts = () => {
         ])
       }
     } else {
+      // For adding new product, still use modal
       setEditingProduct(null)
       setFormData({
         name: '',
@@ -148,12 +157,30 @@ const AdminProducts = () => {
       setAvailableConditions([
         { condition: '', price: '', stock: '' }
       ])
+      setIsModalOpen(true)
     }
-    setIsModalOpen(true)
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
+    setEditingProduct(null)
+    setExpandedProductId(null)
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      category: '',
+      image: '',
+      stock: '',
+      condition: ''
+    })
+    setAvailableConditions([
+      { condition: '', price: '', stock: '' }
+    ])
+  }
+
+  const handleCloseInline = () => {
+    setExpandedProductId(null)
     setEditingProduct(null)
     setFormData({
       name: '',
@@ -236,7 +263,11 @@ const AdminProducts = () => {
       })
 
       if (response.ok) {
-        handleCloseModal()
+        if (expandedProductId) {
+          handleCloseInline()
+        } else {
+          handleCloseModal()
+        }
         loadProducts()
         loadCategories()
       } else {
@@ -436,8 +467,11 @@ const AdminProducts = () => {
                         ? Math.min(...product.availableConditions.map(c => c.price || 0).filter(p => p > 0))
                         : product.price || 0
                       
+                      const isExpanded = expandedProductId === product._id
+                      
                       return (
-                        <tr key={product._id} className="product-row">
+                        <>
+                          <tr key={product._id} className={`product-row ${isExpanded ? 'expanded' : ''}`}>
                           <td className="col-image">
                             {product.image ? (
                               <img 
@@ -490,11 +524,11 @@ const AdminProducts = () => {
                           <td className="col-actions">
                             <div className="product-list-actions">
                               <button
-                                className="edit-btn-small"
+                                className={`edit-btn-small ${isExpanded ? 'active' : ''}`}
                                 onClick={() => handleOpenModal(product)}
                                 title="Redigera"
                               >
-                                Redigera
+                                {isExpanded ? 'Stäng' : 'Redigera'}
                               </button>
                               <button
                                 className="delete-btn-small"
@@ -506,6 +540,133 @@ const AdminProducts = () => {
                             </div>
                           </td>
                         </tr>
+                        {isExpanded && (
+                          <tr className="product-edit-row">
+                            <td colSpan="7" className="product-edit-cell">
+                              <div className="product-edit-form">
+                                <h3 className="product-edit-title">Redigera produkt</h3>
+                                <form className="admin-form" onSubmit={handleSubmit}>
+                                  <div className="form-group">
+                                    <label>Namn *</label>
+                                    <input
+                                      type="text"
+                                      value={formData.name}
+                                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                      required
+                                    />
+                                  </div>
+
+                                  <div className="form-group">
+                                    <label>Beskrivning</label>
+                                    <textarea
+                                      value={formData.description}
+                                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                      rows="3"
+                                    />
+                                  </div>
+
+                                  <div className="form-row-inline">
+                                    <div className="form-group">
+                                      <label>Kategori *</label>
+                                      <select
+                                        value={formData.category}
+                                        onChange={(e) => setFormData({...formData, category: e.target.value})}
+                                        required
+                                        className="form-select"
+                                      >
+                                        <option value="">Välj kategori</option>
+                                        {categories.map(cat => (
+                                          <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                      <label>Bild-URL</label>
+                                      <input
+                                        type="url"
+                                        value={formData.image}
+                                        onChange={(e) => setFormData({...formData, image: e.target.value})}
+                                        placeholder="https://example.com/image.jpg"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div className="form-group">
+                                    <label>Kvalitet/Skick * (Lägg till olika kvaliteter med olika priser och lager)</label>
+                                    <div className="conditions-list">
+                                      {availableConditions.map((condition, index) => (
+                                        <div key={index} className="condition-row">
+                                          <div className="condition-name">
+                                            <input
+                                              type="text"
+                                              value={condition.condition}
+                                              onChange={(e) => handleUpdateCondition(index, 'condition', e.target.value)}
+                                              placeholder="Kvalitet (t.ex. Mint, Very Good)"
+                                              className="condition-input"
+                                            />
+                                          </div>
+                                          <div className="condition-price">
+                                            <input
+                                              type="number"
+                                              step="0.01"
+                                              value={condition.price}
+                                              onChange={(e) => handleUpdateCondition(index, 'price', e.target.value)}
+                                              placeholder="Pris"
+                                              className="condition-input"
+                                            />
+                                          </div>
+                                          <div className="condition-stock">
+                                            <input
+                                              type="number"
+                                              value={condition.stock}
+                                              onChange={(e) => handleUpdateCondition(index, 'stock', e.target.value)}
+                                              placeholder="Lager"
+                                              className="condition-input"
+                                            />
+                                          </div>
+                                          <button
+                                            type="button"
+                                            className="remove-condition-btn"
+                                            onClick={() => {
+                                              const updated = availableConditions.filter((_, i) => i !== index)
+                                              setAvailableConditions(updated.length > 0 ? updated : [{ condition: '', price: '', stock: '' }])
+                                            }}
+                                          >
+                                            ×
+                                          </button>
+                                        </div>
+                                      ))}
+                                      <button
+                                        type="button"
+                                        className="add-condition-btn"
+                                        onClick={() => {
+                                          setAvailableConditions([...availableConditions, { condition: '', price: '', stock: '' }])
+                                        }}
+                                      >
+                                        + Lägg till kvalitet
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {error && (
+                                    <div className="form-message error">{error}</div>
+                                  )}
+
+                                  <div className="form-actions">
+                                    <button type="button" className="cancel-btn" onClick={handleCloseInline}>
+                                      Avbryt
+                                    </button>
+                                    <button type="submit" className="submit-btn" disabled={loading}>
+                                      {loading ? 'Sparar...' : 'Uppdatera'}
+                                    </button>
+                                  </div>
+                                </form>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                        </>
                       )
                     })}
                   </tbody>

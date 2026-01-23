@@ -296,13 +296,6 @@ const Tournament = () => {
 
                 <div className="tournament-list-content">
                   <div className="tournament-list-section">
-                    {tournament.rules && (
-                      <div className="tournament-list-rules">
-                        <h3>Regler</h3>
-                        <p>{tournament.rules}</p>
-                      </div>
-                    )}
-
                     {tournament.prizes && tournament.prizes.length > 0 && (
                       <div className="tournament-list-prizes">
                         <h3>Priser</h3>

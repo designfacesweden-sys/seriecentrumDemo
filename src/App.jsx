@@ -9,6 +9,7 @@ import Shop from './pages/Shop'
 import Product from './pages/Product'
 import Contact from './pages/Contact'
 import FAQ from './pages/FAQ'
+import VisitUs from './pages/VisitUs'
 import Tournament from './pages/TournamentNew'
 import Checkout from './pages/Checkout'
 import Admin from './pages/Admin'
@@ -50,6 +51,7 @@ function AppContent() {
           <Route path="/produkt" element={<Product />} />
           <Route path="/kontakta-oss" element={<Contact />} />
           <Route path="/vanliga-fragor" element={<FAQ />} />
+          <Route path="/besok-oss" element={<VisitUs />} />
           <Route path="/fnm-turneringar" element={<Tournament />} />
           <Route path="/fnm-och-turneringar" element={<Tournament />} />
               <Route path="/admin" element={<AdminLoginWrapper />} />
