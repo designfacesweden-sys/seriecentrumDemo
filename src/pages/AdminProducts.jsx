@@ -595,6 +595,18 @@ const AdminProducts = () => {
                                   <div className="form-group">
                                     <label>Kvalitet/Skick * (Lägg till olika kvaliteter med olika priser och lager)</label>
                                     <div className="conditions-list">
+                                      <div className="condition-header-row">
+                                        <div className="condition-name">
+                                          <label className="condition-label">Kvalitet</label>
+                                        </div>
+                                        <div className="condition-price">
+                                          <label className="condition-label">Pris (kr)</label>
+                                        </div>
+                                        <div className="condition-stock">
+                                          <label className="condition-label">Lager</label>
+                                        </div>
+                                        <div className="condition-actions-header"></div>
+                                      </div>
                                       {availableConditions.map((condition, index) => (
                                         <div key={index} className="condition-row">
                                           <div className="condition-name">
@@ -753,6 +765,18 @@ const AdminProducts = () => {
                 <div className="form-group">
                   <label>Kvalitet/Skick * (Lägg till olika kvaliteter med olika priser och lager)</label>
                   <div className="conditions-list">
+                    <div className="condition-header-row">
+                      <div className="condition-name">
+                        <label className="condition-label">Kvalitet</label>
+                      </div>
+                      <div className="condition-price">
+                        <label className="condition-label">Pris (kr)</label>
+                      </div>
+                      <div className="condition-stock">
+                        <label className="condition-label">Lager</label>
+                      </div>
+                      <div className="condition-actions-header"></div>
+                    </div>
                     {availableConditions.map((condition, index) => (
                       <div key={index} className="condition-row">
                         <div className="condition-name">

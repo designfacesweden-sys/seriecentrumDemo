@@ -4,6 +4,8 @@ import { MongoClient, ObjectId } from 'mongodb';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import bcrypt from 'bcryptjs';
+import { encryptEmail, decryptEmail, isEncrypted } from './encryption.js';
 
 dotenv.config();
 
@@ -22,23 +24,12 @@ let db;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/seriecentrum';
 
 async function connectDB() {
-  // #region agent log
-  console.log('[DEBUG] connectDB entry - MONGODB_URI:', MONGODB_URI);
-  fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:24',message:'connectDB entry',data:{mongodbUri:MONGODB_URI,uriLength:MONGODB_URI?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
   try {
     // Skip connection only if URI is invalid or placeholder
     if (!MONGODB_URI || MONGODB_URI.includes('<cluster-url>') || MONGODB_URI.trim() === '') {
-      // #region agent log
-      console.log('[DEBUG] connectDB skipped - invalid URI:', MONGODB_URI);
-      fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:27',message:'connectDB skipped invalid URI',data:{mongodbUri:MONGODB_URI},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       return null;
     }
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:31',message:'connectDB creating MongoClient',data:{mongodbUri:MONGODB_URI},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     const client = new MongoClient(MONGODB_URI, {
       serverSelectionTimeoutMS: 15000, // Increased for Atlas
       connectTimeoutMS: 15000, // Increased for Atlas
@@ -48,16 +39,10 @@ async function connectDB() {
       retryReads: true
     });
     
-    // #region agent log
-    console.log('[DEBUG] Attempting MongoDB connection...');
-    fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:39',message:'connectDB attempting connection',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     // Use Promise.race with longer timeout for Atlas connections
     const connectionStartTime = Date.now();
     await Promise.race([
       client.connect().then(() => {
-        const connectionTime = Date.now() - connectionStartTime;
-        console.log(`[DEBUG] MongoDB connection successful in ${connectionTime}ms`);
         return true;
       }),
       new Promise((_, reject) => 
@@ -68,12 +53,7 @@ async function connectDB() {
       )
     ]);
     
-    // #region agent log
-    console.log('[DEBUG] connectDB connection successful, setting db');
-    fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:46',message:'connectDB connection successful, setting db',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     db = client.db();
-    console.log('[DEBUG] db set to:', !!db, 'db type:', typeof db);
     
     // Create indexes asynchronously in background (non-blocking)
     setImmediate(async () => {
@@ -97,16 +77,8 @@ async function connectDB() {
       }
     });
     
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:70',message:'connectDB returning client',data:{dbSet:!!db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     return client;
   } catch (error) {
-    // #region agent log
-    console.log('[DEBUG] connectDB error caught:', error.message, 'error name:', error.name, 'db set:', !!db);
-    console.log('[DEBUG] Full error:', error);
-    fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:72',message:'connectDB error caught',data:{error:error.message,errorName:error.name,dbSet:!!db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     return null;
   }
 }
@@ -115,20 +87,8 @@ async function connectDB() {
 let mongoClient;
 let dbConnectionStatus = 'connecting'; // 'connecting', 'connected', 'failed'
 // Use setImmediate to ensure this doesn't block server startup
-// #region agent log
-console.log('[DEBUG] Scheduling database connection, MONGODB_URI:', MONGODB_URI ? 'SET' : 'NOT SET');
-fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:79',message:'setImmediate scheduling connectDB',data:{dbBefore:!!db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-// #endregion
 setImmediate(() => {
-  // #region agent log
-  console.log('[DEBUG] setImmediate callback executing connectDB, db before:', !!db);
-  fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:80',message:'setImmediate callback executing connectDB',data:{dbBefore:!!db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-  // #endregion
   connectDB().then(client => {
-    // #region agent log
-    console.log('[DEBUG] connectDB promise resolved, client:', !!client, 'db:', !!db);
-    fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:81',message:'connectDB promise resolved',data:{clientSet:!!client,dbSet:!!db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     mongoClient = client;
     if (client && db) {
       dbConnectionStatus = 'connected';
@@ -138,10 +98,6 @@ setImmediate(() => {
       console.log('⚠️  MongoDB connection returned but db is not set');
     }
   }).catch(err => {
-    // #region agent log
-    console.log('[DEBUG] connectDB promise rejected:', err.message);
-    fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:83',message:'connectDB promise rejected',data:{error:err.message,dbSet:!!db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     dbConnectionStatus = 'failed';
     console.log('❌ MongoDB connection failed:', err.message);
     console.log('💡 Tips för MongoDB Atlas:');
@@ -177,24 +133,35 @@ app.post('/api/users/register', async (req, res) => {
       return res.status(400).json({ error: 'Ogiltig e-postadress' });
     }
 
-    // Check if account exists in both collections
-    const existingInAccounts = await db.collection('accounts').findOne({ 
-      email: email.toLowerCase().trim() 
-    });
-    const existingInUsers = await db.collection('users').findOne({ 
-      email: email.toLowerCase().trim() 
-    });
+    // Normalize email for checking
+    const normalizedEmail = email.toLowerCase().trim()
     
-    if (existingInAccounts || existingInUsers) {
+    // Check if account exists - need to decrypt emails in database to compare
+    const allAccounts = await db.collection('accounts').find({}).toArray()
+    const allUsers = await db.collection('users').find({}).toArray()
+    
+    // Check decrypted emails
+    const emailExists = [...allAccounts, ...allUsers].some(acc => {
+      const accEmail = isEncrypted(acc.email) ? decryptEmail(acc.email) : acc.email
+      return accEmail.toLowerCase().trim() === normalizedEmail
+    })
+    
+    if (emailExists) {
       return res.status(400).json({ error: 'E-postadressen är redan registrerad' });
     }
 
-    // Simple password hash (in production, use bcrypt)
+    // Hash password using bcrypt
+    const saltRounds = 10
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    
+    // Encrypt email before storing
+    const encryptedEmail = encryptEmail(normalizedEmail)
+
     const account = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      email: email.toLowerCase().trim(),
-      password: password, // In production, hash this
+      email: encryptedEmail, // Encrypted email
+      password: hashedPassword, // Hashed password
       tournamentHistory: [], // Array of tournament IDs
       orderHistory: [], // Array of receipt IDs
       createdAt: new Date(),
@@ -206,8 +173,9 @@ app.post('/api/users/register', async (req, res) => {
     // Also keep 'users' collection for backward compatibility
     await db.collection('users').insertOne(account);
     
-    // Don't send password back
+    // Don't send password back, decrypt email before sending
     const { password: _, ...accountWithoutPassword } = account;
+    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
     res.status(201).json({ user: accountWithoutPassword, message: 'Konto skapat!' });
   } catch (error) {
     res.status(500).json({ error: 'Kunde inte skapa konto' });
@@ -227,15 +195,20 @@ app.post('/api/users/login', async (req, res) => {
       return res.status(400).json({ error: 'E-post och lösenord krävs' });
     }
 
-    // Try accounts collection first, fallback to users for backward compatibility
-    let account = await db.collection('accounts').findOne({ 
-      email: email.toLowerCase().trim() 
-    });
+    const normalizedEmail = email.toLowerCase().trim()
+
+    // Get all accounts and users to check decrypted emails
+    const allAccounts = await db.collection('accounts').find({}).toArray()
+    const allUsers = await db.collection('users').find({}).toArray()
     
-    if (!account) {
-      account = await db.collection('users').findOne({ 
-        email: email.toLowerCase().trim() 
-      });
+    // Find account by decrypting and comparing emails
+    let account = null
+    for (const acc of [...allAccounts, ...allUsers]) {
+      const accEmail = isEncrypted(acc.email) ? decryptEmail(acc.email) : acc.email
+      if (accEmail.toLowerCase().trim() === normalizedEmail) {
+        account = acc
+        break
+      }
     }
 
     // Verify account exists in database
@@ -243,8 +216,9 @@ app.post('/api/users/login', async (req, res) => {
       return res.status(401).json({ error: 'Inget konto hittades med denna e-postadress' });
     }
 
-    // Verify password
-    if (account.password !== password) {
+    // Verify password using bcrypt
+    const isPasswordValid = await bcrypt.compare(password, account.password)
+    if (!isPasswordValid) {
       return res.status(401).json({ error: 'Felaktigt lösenord' });
     }
 
@@ -260,6 +234,8 @@ app.post('/api/users/login', async (req, res) => {
     }
 
     const { password: _, ...accountWithoutPassword } = account;
+    // Decrypt email before sending to client
+    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
     res.json({ user: accountWithoutPassword, message: 'Inloggning lyckades!' });
   } catch (error) {
     res.status(500).json({ error: 'Kunde inte logga in' });
@@ -294,6 +270,8 @@ app.get('/api/users/verify/:id', async (req, res) => {
     }
 
     const { password: _, ...accountWithoutPassword } = account;
+    // Decrypt email before sending to client
+    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
     res.json({ exists: true, user: accountWithoutPassword });
   } catch (error) {
     res.status(500).json({ exists: false, error: 'Kunde inte verifiera konto' });
@@ -344,6 +322,8 @@ app.get('/api/users/:id', async (req, res) => {
     }
 
     const { password: _, ...accountWithoutPassword } = account;
+    // Decrypt email before sending to client
+    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
     res.json(accountWithoutPassword);
   } catch (error) {
     res.status(500).json({ error: 'Kunde inte hämta konto' });
@@ -571,8 +551,9 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
       return res.status(404).json({ error: 'Konto hittades inte. Vänligen logga in igen.' });
     }
 
-    // Verify email matches account
-    if (account.email !== email.toLowerCase()) {
+    // Verify email matches account (decrypt account email first)
+    const accountEmail = isEncrypted(account.email) ? decryptEmail(account.email) : account.email
+    if (accountEmail.toLowerCase().trim() !== email.toLowerCase().trim()) {
       return res.status(400).json({ error: 'E-postadress matchar inte ditt konto' });
     }
 
@@ -592,11 +573,15 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
       return res.status(400).json({ error: 'Turneringen är full' });
     }
 
-    // Check if already registered
-    const alreadyRegistered = tournament.participants.some(p => 
-      (p.userId && p.userId.toString() === userId) || 
-      p.email === email.toLowerCase()
-    );
+    const normalizedEmail = email.toLowerCase().trim()
+    const encryptedParticipantEmail = encryptEmail(normalizedEmail)
+
+    // Check if already registered (decrypt participant emails for comparison)
+    const alreadyRegistered = tournament.participants.some(p => {
+      if (p.userId && p.userId.toString() === userId) return true
+      const pEmail = isEncrypted(p.email) ? decryptEmail(p.email) : p.email
+      return pEmail.toLowerCase().trim() === normalizedEmail
+    });
 
     if (alreadyRegistered) {
       return res.status(400).json({ error: 'Redan registrerad till turneringen' });
@@ -604,7 +589,7 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
 
     const participant = {
       userId: new ObjectId(userId), // Always require userId now
-      email: email.toLowerCase(),
+      email: encryptedParticipantEmail, // Encrypted email
       firstName: firstName || account.firstName,
       lastName: lastName || account.lastName,
       registeredAt: new Date(),
@@ -1020,16 +1005,8 @@ app.delete('/api/tournament/registrations/:id', async (req, res) => {
 
 // Get all products (with pagination)
 app.get('/api/products', async (req, res) => {
-  // #region agent log
-  console.log('[DEBUG] /api/products endpoint hit - db exists:', !!db, 'db type:', typeof db);
-  fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:953',message:'/api/products endpoint hit',data:{dbExists:!!db,dbType:typeof db,query:req.query},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
   try {
     if (!db) {
-      // #region agent log
-      console.log('[DEBUG] /api/products db check FAILED - returning 503');
-      fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:955',message:'/api/products db check failed',data:{dbExists:!!db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
       return res.status(503).json({ error: 'Database not available' });
     }
 
@@ -1226,16 +1203,8 @@ app.delete('/api/products/:id', async (req, res) => {
 
 // Get categories
 app.get('/api/products/categories', async (req, res) => {
-  // #region agent log
-  console.log('[DEBUG] /api/products/categories endpoint hit - db exists:', !!db, 'db type:', typeof db);
-  fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:1146',message:'/api/products/categories endpoint hit',data:{dbExists:!!db,dbType:typeof db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
   try {
     if (!db) {
-      // #region agent log
-      console.log('[DEBUG] /api/products/categories db check FAILED - returning 503');
-      fetch('http://127.0.0.1:7242/ingest/96537b40-eeb4-4ca5-8575-e6b60376d949',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server.js:1148',message:'/api/products/categories db check failed',data:{dbExists:!!db},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
       return res.status(503).json({ error: 'Database not available' });
     }
 
@@ -1293,9 +1262,11 @@ app.get('/api/users', async (req, res) => {
       accounts = await db.collection('users').find({}).toArray();
     }
 
-    // Remove passwords from response
+    // Remove passwords from response and decrypt emails
     const accountsWithoutPasswords = accounts.map(account => {
       const { password, ...accountWithoutPassword } = account;
+      // Decrypt email before sending to client
+      accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
       return accountWithoutPassword;
     });
 
@@ -1320,21 +1291,28 @@ app.post('/api/users', async (req, res) => {
       });
     }
 
-    // Check if account exists
-    const existing = await db.collection('accounts').findOne({ 
-      email: email.toLowerCase() 
-    });
+    const normalizedEmail = email.toLowerCase().trim()
+    
+    // Check if account exists - need to decrypt emails in database to compare
+    const allAccounts = await db.collection('accounts').find({}).toArray()
+    const emailExists = allAccounts.some(acc => {
+      const accEmail = isEncrypted(acc.email) ? decryptEmail(acc.email) : acc.email
+      return accEmail.toLowerCase().trim() === normalizedEmail
+    })
 
-    if (existing) {
+    if (emailExists) {
       return res.status(400).json({ 
         error: 'Konto med denna e-post finns redan' 
       });
     }
 
+    // Encrypt email before storing
+    const encryptedEmail = encryptEmail(normalizedEmail)
+
     const account = {
       firstName: firstName || '',
       lastName: lastName || '',
-      email: email.toLowerCase(),
+      email: encryptedEmail, // Encrypted email
       phone: phone || '',
       tournamentHistory: [],
       orderHistory: [],
@@ -1352,6 +1330,8 @@ app.post('/api/users', async (req, res) => {
     });
 
     const { password: _, ...accountWithoutPassword } = account;
+    // Decrypt email before sending to client
+    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
     res.status(201).json({ 
       message: 'Konto skapat', 
       user: accountWithoutPassword 

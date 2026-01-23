@@ -19,7 +19,7 @@ const VisitUs = () => {
           
           <div className="visit-map">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2265.1234567890123!2d13.1234567!3d55.1234567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTXCsDA3JzI0LjQiTiAxM8KwMDcnMjQuNSJF!5e0!3m2!1ssv!2sse!4v1234567890123!5m2!1ssv!2sse&q=Hedvägen+155,+231+66+Trelleborg"
+              src="https://www.google.com/maps?q=Hedvägen+155,+231+66+Trelleborg,+Sweden&output=embed"
               width="100%"
               height="400"
               style={{ border: 0, borderRadius: '12px' }}
