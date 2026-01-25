@@ -25,14 +25,19 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/seriec
 
 async function connectDB() {
   try {
-    // Skip connection only if URI is invalid or placeholder
+    // Check if MONGODB_URI is set
     if (!MONGODB_URI || MONGODB_URI.includes('<cluster-url>') || MONGODB_URI.trim() === '') {
+      console.log('❌ MONGODB_URI is not set or is invalid');
+      console.log('💡 Create a .env file with: MONGODB_URI=your_connection_string');
       return null;
     }
 
+    console.log('🔄 Attempting to connect to MongoDB...');
+    console.log(`   URI: ${MONGODB_URI.replace(/:[^:@]+@/, ':****@')}`); // Hide password in logs
+
     const client = new MongoClient(MONGODB_URI, {
-      serverSelectionTimeoutMS: 15000, // Increased for Atlas
-      connectTimeoutMS: 15000, // Increased for Atlas
+      serverSelectionTimeoutMS: 20000, // Increased for Atlas
+      connectTimeoutMS: 20000, // Increased for Atlas
       socketTimeoutMS: 30000, // Keep connections alive longer
       maxPoolSize: 10,
       retryWrites: true,
@@ -49,11 +54,15 @@ async function connectDB() {
         setTimeout(() => {
           const elapsed = Date.now() - connectionStartTime;
           reject(new Error(`Connection timeout after ${elapsed}ms. Check: 1) IP whitelist in MongoDB Atlas, 2) Network connectivity, 3) Firewall settings`))
-        }, 15000) // Increased to 15 seconds for Atlas
+        }, 20000) // Increased to 20 seconds for Atlas
       )
     ]);
     
     db = client.db();
+    
+    // Test the connection
+    await db.admin().ping();
+    console.log('✅ MongoDB connection successful!');
     
     // Create indexes asynchronously in background (non-blocking)
     setImmediate(async () => {
@@ -72,13 +81,26 @@ async function connectDB() {
         await db.collection('tournaments').createIndex({ createdAt: -1 });
         await db.collection('tournaments').createIndex({ 'participants.userId': 1 });
         await db.collection('tournaments').createIndex({ 'participants.email': 1 });
+        console.log('✅ Database indexes created');
       } catch (indexError) {
         // Indexes might already exist, that's okay
+        console.log('ℹ️  Index creation note:', indexError.message);
       }
     });
     
     return client;
   } catch (error) {
+    console.error('❌ MongoDB connection error:', error.message);
+    if (error.message.includes('authentication failed')) {
+      console.log('💡 Check your MongoDB username and password in .env');
+    } else if (error.message.includes('timeout')) {
+      console.log('💡 MongoDB connection timeout. Check:');
+      console.log('   1. IP whitelist in MongoDB Atlas (Network Access)');
+      console.log('   2. Your internet connection');
+      console.log('   3. MongoDB Atlas cluster is running');
+    } else if (error.message.includes('ENOTFOUND') || error.message.includes('getaddrinfo')) {
+      console.log('💡 Cannot resolve MongoDB hostname. Check your MONGODB_URI in .env');
+    }
     return null;
   }
 }
@@ -136,13 +158,25 @@ app.post('/api/users/register', async (req, res) => {
     // Normalize email for checking
     const normalizedEmail = email.toLowerCase().trim()
     
-    // Check if account exists - need to decrypt emails in database to compare
+    // Check if account exists - handle both encrypted (old) and plain text (new) emails
     const allAccounts = await db.collection('accounts').find({}).toArray()
     const allUsers = await db.collection('users').find({}).toArray()
     
-    // Check decrypted emails
+    // Check emails (decrypt old encrypted emails for comparison)
     const emailExists = [...allAccounts, ...allUsers].some(acc => {
-      const accEmail = isEncrypted(acc.email) ? decryptEmail(acc.email) : acc.email
+      if (!acc.email) return false
+      let accEmail = acc.email
+      // Try to decrypt if it looks encrypted (for backward compatibility)
+      if (isEncrypted(acc.email)) {
+        try {
+          const decrypted = decryptEmail(acc.email)
+          if (decrypted && decrypted !== acc.email && decrypted.includes('@')) {
+            accEmail = decrypted
+          }
+        } catch (e) {
+          // Keep original if decryption fails
+        }
+      }
       return accEmail.toLowerCase().trim() === normalizedEmail
     })
     
@@ -153,14 +187,11 @@ app.post('/api/users/register', async (req, res) => {
     // Hash password using bcrypt
     const saltRounds = 10
     const hashedPassword = await bcrypt.hash(password, saltRounds)
-    
-    // Encrypt email before storing
-    const encryptedEmail = encryptEmail(normalizedEmail)
 
     const account = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      email: encryptedEmail, // Encrypted email
+      email: normalizedEmail, // Store email in plain text (no encryption)
       password: hashedPassword, // Hashed password
       tournamentHistory: [], // Array of tournament IDs
       orderHistory: [], // Array of receipt IDs
@@ -173,9 +204,8 @@ app.post('/api/users/register', async (req, res) => {
     // Also keep 'users' collection for backward compatibility
     await db.collection('users').insertOne(account);
     
-    // Don't send password back, decrypt email before sending
+    // Don't send password back
     const { password: _, ...accountWithoutPassword } = account;
-    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
     res.status(201).json({ user: accountWithoutPassword, message: 'Konto skapat!' });
   } catch (error) {
     res.status(500).json({ error: 'Kunde inte skapa konto' });
@@ -197,17 +227,39 @@ app.post('/api/users/login', async (req, res) => {
 
     const normalizedEmail = email.toLowerCase().trim()
 
-    // Get all accounts and users to check decrypted emails
+    // Find account by email - handle both encrypted (old) and plain text (new) emails
     const allAccounts = await db.collection('accounts').find({}).toArray()
     const allUsers = await db.collection('users').find({}).toArray()
     
-    // Find account by decrypting and comparing emails
     let account = null
     for (const acc of [...allAccounts, ...allUsers]) {
-      const accEmail = isEncrypted(acc.email) ? decryptEmail(acc.email) : acc.email
-      if (accEmail.toLowerCase().trim() === normalizedEmail) {
-        account = acc
-        break
+      if (!acc.email) continue
+      
+      try {
+        let accEmail = acc.email
+        
+        // If email looks encrypted (old account), try to decrypt for comparison
+        if (isEncrypted(acc.email)) {
+          try {
+            const decrypted = decryptEmail(acc.email)
+            if (decrypted && decrypted !== acc.email && decrypted.includes('@')) {
+              accEmail = decrypted
+            }
+          } catch (decryptErr) {
+            // Keep original if decryption fails
+            accEmail = acc.email
+          }
+        }
+        
+        // Normalize and compare
+        const normalizedAccEmail = accEmail.toLowerCase().trim()
+        if (normalizedAccEmail === normalizedEmail) {
+          account = acc
+          break
+        }
+      } catch (err) {
+        // Skip accounts with errors
+        continue
       }
     }
 
@@ -217,7 +269,41 @@ app.post('/api/users/login', async (req, res) => {
     }
 
     // Verify password using bcrypt
-    const isPasswordValid = await bcrypt.compare(password, account.password)
+    // User always enters password in plain text - we hash it and compare with stored hash
+    // If password in DB is not hashed (old account), we need to handle it temporarily
+    let isPasswordValid = false
+    
+    if (!account.password) {
+      return res.status(401).json({ error: 'Felaktigt lösenord' });
+    }
+    
+    try {
+      // Check if password is hashed (bcrypt hashes start with $2a$, $2b$, or $2y$)
+      if (account.password.startsWith('$2')) {
+        // Normal case: compare plain text password (from user) with stored hash
+        isPasswordValid = await bcrypt.compare(password, account.password)
+      } else {
+        // Legacy account with plain text password - compare directly and migrate
+        // User enters plain text password, we compare with plain text in DB
+        if (account.password === password) {
+          isPasswordValid = true
+          // Hash the user's password and update DB (one-time migration)
+          const hashedPassword = await bcrypt.hash(password, 10)
+          // Update password to hashed version in both collections
+          await db.collection('accounts').updateOne(
+            { _id: account._id },
+            { $set: { password: hashedPassword, updatedAt: new Date() } }
+          )
+          await db.collection('users').updateOne(
+            { _id: account._id },
+            { $set: { password: hashedPassword, updatedAt: new Date() } }
+          )
+        }
+      }
+    } catch (bcryptError) {
+      return res.status(500).json({ error: 'Fel vid lösenordsverifiering' });
+    }
+    
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Felaktigt lösenord' });
     }
@@ -234,13 +320,82 @@ app.post('/api/users/login', async (req, res) => {
     }
 
     const { password: _, ...accountWithoutPassword } = account;
-    // Decrypt email before sending to client
-    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
+    // Decrypt email if it's encrypted (for old accounts), otherwise use as-is
+    if (isEncrypted(accountWithoutPassword.email)) {
+      try {
+        const decrypted = decryptEmail(accountWithoutPassword.email)
+        if (decrypted && decrypted.includes('@')) {
+          accountWithoutPassword.email = decrypted
+        }
+      } catch (e) {
+        // Keep original if decryption fails
+      }
+    }
+    
     res.json({ user: accountWithoutPassword, message: 'Inloggning lyckades!' });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ error: 'Kunde inte logga in' });
   }
 });
+
+// Migrate old passwords to hashed passwords (one-time migration endpoint)
+// This endpoint should be secured in production (admin only)
+app.post('/api/users/migrate-passwords', async (req, res) => {
+  try {
+    if (!db) {
+      return res.status(503).json({ error: 'Database not available' });
+    }
+
+    // Find all accounts with unhashed passwords (passwords that don't start with $2)
+    const allAccounts = await db.collection('accounts').find({}).toArray()
+    const allUsers = await db.collection('users').find({}).toArray()
+    
+    const accountsToMigrate = [...allAccounts, ...allUsers].filter(acc => {
+      return acc.password && !acc.password.startsWith('$2')
+    })
+
+    if (accountsToMigrate.length === 0) {
+      return res.json({ 
+        message: 'Inga konton behöver migrering',
+        migrated: 0 
+      })
+    }
+
+    let migrated = 0
+    const saltRounds = 10
+
+    for (const account of accountsToMigrate) {
+      try {
+        // Hash the plain text password
+        const hashedPassword = await bcrypt.hash(account.password, saltRounds)
+        
+        // Update in both collections
+        await db.collection('accounts').updateOne(
+          { _id: account._id },
+          { $set: { password: hashedPassword, updatedAt: new Date() } }
+        )
+        
+        await db.collection('users').updateOne(
+          { _id: account._id },
+          { $set: { password: hashedPassword, updatedAt: new Date() } }
+        )
+        
+        migrated++
+      } catch (error) {
+        console.error(`Error migrating account ${account._id}:`, error)
+      }
+    }
+
+    res.json({ 
+      message: `Migrerade ${migrated} av ${accountsToMigrate.length} konton`,
+      migrated,
+      total: accountsToMigrate.length
+    })
+  } catch (error) {
+    res.status(500).json({ error: 'Kunde inte migrera lösenord' })
+  }
+})
 
 // Verify account exists (for session validation)
 app.get('/api/users/verify/:id', async (req, res) => {
@@ -270,8 +425,17 @@ app.get('/api/users/verify/:id', async (req, res) => {
     }
 
     const { password: _, ...accountWithoutPassword } = account;
-    // Decrypt email before sending to client
-    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
+    // Decrypt email if encrypted (for old accounts)
+    if (isEncrypted(accountWithoutPassword.email)) {
+      try {
+        const decrypted = decryptEmail(accountWithoutPassword.email)
+        if (decrypted && decrypted.includes('@')) {
+          accountWithoutPassword.email = decrypted
+        }
+      } catch (e) {
+        // Keep original if decryption fails
+      }
+    }
     res.json({ exists: true, user: accountWithoutPassword });
   } catch (error) {
     res.status(500).json({ exists: false, error: 'Kunde inte verifiera konto' });
@@ -322,8 +486,17 @@ app.get('/api/users/:id', async (req, res) => {
     }
 
     const { password: _, ...accountWithoutPassword } = account;
-    // Decrypt email before sending to client
-    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
+    // Decrypt email if encrypted (for old accounts)
+    if (isEncrypted(accountWithoutPassword.email)) {
+      try {
+        const decrypted = decryptEmail(accountWithoutPassword.email)
+        if (decrypted && decrypted.includes('@')) {
+          accountWithoutPassword.email = decrypted
+        }
+      } catch (e) {
+        // Keep original if decryption fails
+      }
+    }
     res.json(accountWithoutPassword);
   } catch (error) {
     res.status(500).json({ error: 'Kunde inte hämta konto' });
@@ -551,9 +724,23 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
       return res.status(404).json({ error: 'Konto hittades inte. Vänligen logga in igen.' });
     }
 
-    // Verify email matches account (decrypt account email first)
-    const accountEmail = isEncrypted(account.email) ? decryptEmail(account.email) : account.email
-    if (accountEmail.toLowerCase().trim() !== email.toLowerCase().trim()) {
+    // Verify email matches account (decrypt if encrypted for old accounts)
+    let accountEmail = account.email
+    if (isEncrypted(account.email)) {
+      try {
+        const decrypted = decryptEmail(account.email)
+        if (decrypted && decrypted.includes('@')) {
+          accountEmail = decrypted
+        }
+      } catch (e) {
+        // Keep original if decryption fails
+      }
+    }
+    
+    const normalizedAccountEmail = accountEmail.toLowerCase().trim()
+    const normalizedInputEmail = email.toLowerCase().trim()
+    
+    if (normalizedAccountEmail !== normalizedInputEmail) {
       return res.status(400).json({ error: 'E-postadress matchar inte ditt konto' });
     }
 
@@ -574,12 +761,21 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim()
-    const encryptedParticipantEmail = encryptEmail(normalizedEmail)
 
-    // Check if already registered (decrypt participant emails for comparison)
+    // Check if already registered (decrypt participant emails if encrypted for old data)
     const alreadyRegistered = tournament.participants.some(p => {
       if (p.userId && p.userId.toString() === userId) return true
-      const pEmail = isEncrypted(p.email) ? decryptEmail(p.email) : p.email
+      let pEmail = p.email
+      if (isEncrypted(p.email)) {
+        try {
+          const decrypted = decryptEmail(p.email)
+          if (decrypted && decrypted.includes('@')) {
+            pEmail = decrypted
+          }
+        } catch (e) {
+          // Keep original if decryption fails
+        }
+      }
       return pEmail.toLowerCase().trim() === normalizedEmail
     });
 
@@ -589,7 +785,7 @@ app.post('/api/tournaments/:id/register', async (req, res) => {
 
     const participant = {
       userId: new ObjectId(userId), // Always require userId now
-      email: encryptedParticipantEmail, // Encrypted email
+      email: normalizedEmail, // Store email in plain text (no encryption)
       firstName: firstName || account.firstName,
       lastName: lastName || account.lastName,
       registeredAt: new Date(),
@@ -643,44 +839,60 @@ app.post('/api/tournaments/:id/start', async (req, res) => {
       return res.status(404).json({ error: 'Turnering hittades inte' });
     }
 
-    if (!tournament.participants || tournament.participants.length < 2) {
-      return res.status(400).json({ 
-        error: 'Behöver minst 2 deltagare för att starta',
-        currentParticipants: tournament.participants?.length || 0
-      });
-    }
-
     if (tournament.status === 'started' || tournament.status === 'finished') {
       return res.status(400).json({ error: 'Turneringen är redan startad eller avslutad' });
     }
 
-    // Create first round pairings (random for round 1)
-    const participants = [...tournament.participants];
+    // Get participants - allow any number (including 0 or 1)
+    const participants = tournament.participants || [];
+    const participantCount = participants.length;
     const pairings = [];
     
-    // Shuffle participants for round 1
-    for (let i = participants.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [participants[i], participants[j]] = [participants[j], participants[i]];
-    }
+    // Customize tournament setup based on number of participants
+    if (participantCount === 0) {
+      // No participants - create empty tournament
+      pairings.push({
+        player1: null,
+        player2: null,
+        result: null,
+        completed: false,
+        note: 'Inga deltagare registrerade'
+      });
+    } else if (participantCount === 1) {
+      // Single participant - give them a bye
+      pairings.push({
+        player1: participants[0],
+        player2: null,
+        result: { player1Wins: 2, player2Wins: 0, draws: 0 }, // Bye = win
+        completed: true
+      });
+    } else {
+      // Multiple participants - create pairings
+      // Shuffle participants for round 1
+      const shuffled = [...participants];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
 
-    // Create pairings
-    for (let i = 0; i < participants.length; i += 2) {
-      if (i + 1 < participants.length) {
-        pairings.push({
-          player1: participants[i],
-          player2: participants[i + 1],
-          result: null, // { player1Wins, player2Wins, draws }
-          completed: false
-        });
-      } else {
-        // Bye for odd number of players
-        pairings.push({
-          player1: participants[i],
-          player2: null,
-          result: { player1Wins: 2, player2Wins: 0, draws: 0 }, // Bye = win
-          completed: true
-        });
+      // Create pairings
+      for (let i = 0; i < shuffled.length; i += 2) {
+        if (i + 1 < shuffled.length) {
+          pairings.push({
+            player1: shuffled[i],
+            player2: shuffled[i + 1],
+            result: null, // { player1Wins, player2Wins, draws }
+            completed: false
+          });
+        } else {
+          // Bye for odd number of players
+          pairings.push({
+            player1: shuffled[i],
+            player2: null,
+            result: { player1Wins: 2, player2Wins: 0, draws: 0 }, // Bye = win
+            completed: true
+          });
+        }
       }
     }
 
@@ -1262,11 +1474,20 @@ app.get('/api/users', async (req, res) => {
       accounts = await db.collection('users').find({}).toArray();
     }
 
-    // Remove passwords from response and decrypt emails
+    // Remove passwords from response and decrypt emails if encrypted (for old accounts)
     const accountsWithoutPasswords = accounts.map(account => {
       const { password, ...accountWithoutPassword } = account;
-      // Decrypt email before sending to client
-      accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
+      // Decrypt email if encrypted (for old accounts)
+      if (isEncrypted(accountWithoutPassword.email)) {
+        try {
+          const decrypted = decryptEmail(accountWithoutPassword.email)
+          if (decrypted && decrypted.includes('@')) {
+            accountWithoutPassword.email = decrypted
+          }
+        } catch (e) {
+          // Keep original if decryption fails
+        }
+      }
       return accountWithoutPassword;
     });
 
@@ -1306,13 +1527,10 @@ app.post('/api/users', async (req, res) => {
       });
     }
 
-    // Encrypt email before storing
-    const encryptedEmail = encryptEmail(normalizedEmail)
-
     const account = {
       firstName: firstName || '',
       lastName: lastName || '',
-      email: encryptedEmail, // Encrypted email
+      email: normalizedEmail, // Store email in plain text (no encryption)
       phone: phone || '',
       tournamentHistory: [],
       orderHistory: [],
@@ -1330,8 +1548,7 @@ app.post('/api/users', async (req, res) => {
     });
 
     const { password: _, ...accountWithoutPassword } = account;
-    // Decrypt email before sending to client
-    accountWithoutPassword.email = decryptEmail(accountWithoutPassword.email)
+    // Email is already in plain text, no need to decrypt
     res.status(201).json({ 
       message: 'Konto skapat', 
       user: accountWithoutPassword 
@@ -1696,7 +1913,13 @@ app.use('/api/*', (req, res) => {
 
 // Start server immediately (don't wait for database)
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📡 API endpoints available at http://localhost:${PORT}/api`);
+  console.log(`💾 Database status: ${db ? '✅ Connected' : '⏳ Connecting...'}`);
+  if (!db) {
+    console.log('⚠️  Server started but database is not yet connected');
+    console.log('   API will return 503 until database connection is established');
+  }
 });
 
 // Graceful shutdown

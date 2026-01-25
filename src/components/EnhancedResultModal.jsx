@@ -92,110 +92,81 @@ const EnhancedResultModal = ({ isOpen, onClose, tournament, roundNumber, pairing
 
   const opponent = isPlayer1 ? pairing.player2 : pairing.player1
 
+  // Only allow submission if user is involved in the match
+  if (!user || (!isPlayer1 && !(pairing.player2 && (pairing.player2?.userId?.toString() === user._id || pairing.player2?.email === user.email)))) {
+    return null
+  }
+
   return (
-    <div className="enhanced-result-modal-overlay" onClick={onClose}>
-      <div className="enhanced-result-modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="enhanced-modal-close" onClick={onClose}>×</button>
+    <div className="result-modal-overlay-clean" onClick={onClose}>
+      <div className="result-modal-content-clean" onClick={(e) => e.stopPropagation()}>
+        <button className="result-modal-close-clean" onClick={onClose}>×</button>
         
-        <div className="enhanced-modal-header">
+        <div className="result-modal-header-clean">
           <h2>Skicka in resultat</h2>
-          <div className="match-info-summary">
-            <div className="match-opponent">
-              Motståndare: <strong>{opponent ? `${opponent.firstName} ${opponent.lastName}` : 'BYE'}</strong>
-            </div>
+          <div className="result-opponent-info">
+            Motståndare: <strong>{opponent ? `${opponent.firstName} ${opponent.lastName}` : 'BYE'}</strong>
           </div>
         </div>
 
         {submissionStatus === 'pending' && (
-          <div className="submission-status pending">
-            <div className="status-spinner"></div>
+          <div className="submission-status-clean pending">
+            <div className="status-spinner-clean"></div>
             <p>Skickar in resultat...</p>
           </div>
         )}
 
         {submissionStatus === 'confirmed' && (
-          <div className="submission-status confirmed">
-            <div className="status-checkmark">✓</div>
+          <div className="submission-status-clean confirmed">
+            <div className="status-checkmark-clean">✓</div>
             <p>Resultat skickat in!</p>
           </div>
         )}
 
         {submissionStatus === 'idle' && (
-          <form className="enhanced-result-form" onSubmit={handleSubmit}>
-            {error && <div className="form-error">{error}</div>}
+          <form className="result-form-clean" onSubmit={handleSubmit}>
+            {error && <div className="form-error-clean">{error}</div>}
 
-            <div className="result-quick-select">
-              <div className="quick-select-label">Välj resultat:</div>
-              <div className="quick-select-buttons">
-                <button
-                  type="button"
-                  className={`quick-select-btn ${formData.result === 'win' ? 'active' : ''}`}
-                  onClick={() => handleResultSelect('win')}
-                >
-                  Vinst
-                </button>
-                <button
-                  type="button"
-                  className={`quick-select-btn ${formData.result === 'loss' ? 'active' : ''}`}
-                  onClick={() => handleResultSelect('loss')}
-                >
-                  Förlust
-                </button>
-                <button
-                  type="button"
-                  className={`quick-select-btn ${formData.result === 'draw' ? 'active' : ''}`}
-                  onClick={() => handleResultSelect('draw')}
-                >
-                  Oavgjort
-                </button>
+            <div className="score-inputs-clean">
+              <div className="score-input-group-clean">
+                <label>Du</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="3"
+                  value={isPlayer1 ? formData.player1Wins : formData.player2Wins}
+                  onChange={(e) => setFormData(prev => ({ 
+                    ...prev, 
+                    [isPlayer1 ? 'player1Wins' : 'player2Wins']: e.target.value 
+                  }))}
+                  placeholder="0"
+                  className="score-input-clean"
+                />
+              </div>
+              <div className="score-separator-clean">-</div>
+              <div className="score-input-group-clean">
+                <label>{opponent ? `${opponent.firstName}` : 'Motståndare'}</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="3"
+                  value={isPlayer1 ? formData.player2Wins : formData.player1Wins}
+                  onChange={(e) => setFormData(prev => ({ 
+                    ...prev, 
+                    [isPlayer1 ? 'player2Wins' : 'player1Wins']: e.target.value 
+                  }))}
+                  placeholder="0"
+                  className="score-input-clean"
+                />
               </div>
             </div>
 
-            <div className="result-details-section">
-              <div className="details-label">Spelresultat (valfritt):</div>
-              <div className="result-inputs-grid">
-                <div className="result-input-group">
-                  <label>{pairing.player1?.firstName || 'Spelare 1'} vinster</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="3"
-                    value={formData.player1Wins}
-                    onChange={(e) => setFormData(prev => ({ ...prev, player1Wins: e.target.value }))}
-                    placeholder="0"
-                  />
-                </div>
-                <div className="result-input-group">
-                  <label>Oavgjorda</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="3"
-                    value={formData.draws}
-                    onChange={(e) => setFormData(prev => ({ ...prev, draws: e.target.value }))}
-                    placeholder="0"
-                  />
-                </div>
-                <div className="result-input-group">
-                  <label>{pairing.player2?.firstName || 'Spelare 2'} vinster</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="3"
-                    value={formData.player2Wins}
-                    onChange={(e) => setFormData(prev => ({ ...prev, player2Wins: e.target.value }))}
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="form-actions">
-              <button type="button" className="cancel-btn" onClick={onClose}>
+            <div className="form-actions-clean">
+              <button type="button" className="cancel-btn-clean" onClick={onClose}>
                 Avbryt
               </button>
-              <button type="submit" className="submit-btn primary" disabled={loading}>
-                {loading ? 'Skickar...' : 'Bekräfta resultat'}
+              <button type="submit" className="submit-btn-clean" disabled={loading}>
+                {loading ? 'Skickar...' : 'Skicka in'}
               </button>
             </div>
           </form>

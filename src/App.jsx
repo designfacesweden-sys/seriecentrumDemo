@@ -44,7 +44,7 @@ function AppContent() {
   return (
     <div className="app">
       {!isAdminPage && <Navbar />}
-      <main>
+      <main className={isAdminPage ? 'admin-main-wrapper' : ''}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/butik" element={<Shop />} />

@@ -25,16 +25,34 @@ export const encryptEmail = (email) => {
 /**
  * Decrypt email using AES decryption
  * @param {string} encryptedEmail - Encrypted email to decrypt
- * @returns {string} Decrypted email
+ * @returns {string} Decrypted email, or original if decryption fails
  */
 export const decryptEmail = (encryptedEmail) => {
   if (!encryptedEmail) return encryptedEmail
+  
+  // If it doesn't look encrypted, return as-is
+  if (!isEncrypted(encryptedEmail)) {
+    return encryptedEmail
+  }
+  
   try {
     const bytes = CryptoJS.AES.decrypt(encryptedEmail, ENCRYPTION_KEY)
     const decrypted = bytes.toString(CryptoJS.enc.Utf8)
-    return decrypted || encryptedEmail // Return original if decryption fails
+    
+    // If decryption resulted in empty string or same value, it likely failed
+    if (!decrypted || decrypted.trim() === '') {
+      return encryptedEmail
+    }
+    
+    // Verify it looks like an email (contains @)
+    if (decrypted.includes('@')) {
+      return decrypted
+    }
+    
+    // If it doesn't look like an email, decryption probably failed
+    return encryptedEmail
   } catch (error) {
-    console.error('Error decrypting email:', error)
+    // If decryption throws an error, return original
     return encryptedEmail
   }
 }
@@ -46,6 +64,14 @@ export const decryptEmail = (encryptedEmail) => {
  */
 export const isEncrypted = (str) => {
   if (!str) return false
-  // Encrypted strings typically have a specific format from crypto-js
-  return str.includes('/') && str.length > 20
+  // CryptoJS encrypted strings typically:
+  // 1. Start with "U2FsdGVkX1" (base64 encoded "Salted__")
+  // 2. Are longer than typical email addresses
+  // 3. Don't contain @ symbol (emails always have @)
+  // 4. Contain base64 characters and slashes
+  if (str.startsWith('U2FsdGVkX1')) {
+    return true
+  }
+  // Fallback: check if it looks like encrypted data (long, no @, contains /)
+  return str.length > 30 && !str.includes('@') && (str.includes('/') || str.includes('+') || str.includes('='))
 }

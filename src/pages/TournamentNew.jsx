@@ -4,13 +4,33 @@ import LoginModal from '../components/LoginModal'
 import RegisterModal from '../components/RegisterModal'
 import ResultModal from '../components/ResultModal'
 import EnhancedResultModal from '../components/EnhancedResultModal'
-import LiveTournamentDashboard from '../components/LiveTournamentDashboard'
-import MatchPairingsView from '../components/MatchPairingsView'
-import PersonalMatchHighlight from '../components/PersonalMatchHighlight'
-import LiveStandings from '../components/LiveStandings'
-import PrizeShowcase from '../components/PrizeShowcase'
+import TournamentBracket from '../components/TournamentBracket'
 
 const API_URL = '/api'
+
+// Fake participants array for demonstration
+const FAKE_PARTICIPANTS = [
+  { firstName: 'Erik', lastName: 'Andersson', email: 'erik.andersson@example.com' },
+  { firstName: 'Maria', lastName: 'Johansson', email: 'maria.johansson@example.com' },
+  { firstName: 'Johan', lastName: 'Svensson', email: 'johan.svensson@example.com' },
+  { firstName: 'Anna', lastName: 'Gustafsson', email: 'anna.gustafsson@example.com' },
+  { firstName: 'Lars', lastName: 'Pettersson', email: 'lars.pettersson@example.com' },
+  { firstName: 'Emma', lastName: 'Eriksson', email: 'emma.eriksson@example.com' },
+  { firstName: 'Anders', lastName: 'Nilsson', email: 'anders.nilsson@example.com' },
+  { firstName: 'Sara', lastName: 'Larsson', email: 'sara.larsson@example.com' },
+  { firstName: 'Mikael', lastName: 'Karlsson', email: 'mikael.karlsson@example.com' },
+  { firstName: 'Lisa', lastName: 'Olsson', email: 'lisa.olsson@example.com' },
+  { firstName: 'Daniel', lastName: 'Berg', email: 'daniel.berg@example.com' },
+  { firstName: 'Karin', lastName: 'Lindqvist', email: 'karin.lindqvist@example.com' },
+  { firstName: 'Fredrik', lastName: 'Hansson', email: 'fredrik.hansson@example.com' },
+  { firstName: 'Malin', lastName: 'Jönsson', email: 'malin.jonsson@example.com' },
+  { firstName: 'Per', lastName: 'Lindberg', email: 'per.lindberg@example.com' },
+  { firstName: 'Helena', lastName: 'Axelsson', email: 'helena.axelsson@example.com' },
+  { firstName: 'Magnus', lastName: 'Sandberg', email: 'magnus.sandberg@example.com' },
+  { firstName: 'Jenny', lastName: 'Holm', email: 'jenny.holm@example.com' },
+  { firstName: 'Stefan', lastName: 'Lundqvist', email: 'stefan.lundqvist@example.com' },
+  { firstName: 'Camilla', lastName: 'Bergström', email: 'camilla.bergstrom@example.com' }
+]
 
 const Tournament = () => {
   const { user, login, logout } = useUser()
@@ -334,46 +354,82 @@ const Tournament = () => {
                 )}
 
                 {tournament.status === 'started' && (
-                  <div className="tournament-live-view">
-                    <LiveTournamentDashboard tournament={tournament} user={user} />
-                    
-                    <PersonalMatchHighlight
-                      tournament={tournament}
-                      user={user}
-                      onResultSubmit={(pairing, roundNumber, pairingIndex) => {
-                        setResultModal({
-                          isOpen: true,
-                          pairing,
-                          roundNumber,
-                          pairingIndex,
-                          tournamentId: tournament._id
-                        })
-                      }}
-                    />
-                    
-                    <MatchPairingsView
-                      tournament={tournament}
-                      user={user}
-                      onResultSubmit={(pairing, roundNumber, pairingIndex) => {
-                        setResultModal({
-                          isOpen: true,
-                          pairing,
-                          roundNumber,
-                          pairingIndex,
-                          tournamentId: tournament._id
-                        })
-                      }}
-                    />
-                    
-                    <div className="tournament-live-sections">
-                      <div className="live-section-left">
-                        <LiveStandings tournament={tournament} />
+                  <>
+                    {user ? (
+                      <>
+                        <div className="tournament-participants-list">
+                          <h3>Deltagare ({FAKE_PARTICIPANTS.length})</h3>
+                          <div className="participants-grid">
+                            {FAKE_PARTICIPANTS.map((participant, index) => (
+                              <div key={index} className="participant-card">
+                                <div className="participant-number">{index + 1}</div>
+                                <div className="participant-name">
+                                  {participant.firstName} {participant.lastName}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <TournamentBracket 
+                          tournament={tournament} 
+                          user={user}
+                          onResultSubmit={(pairing, roundNumber, pairingIndex) => {
+                            setResultModal({
+                              isOpen: true,
+                              pairing,
+                              roundNumber,
+                              pairingIndex,
+                              tournamentId: tournament._id
+                            })
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <div className="tournament-widget-view">
+                        <div className="tournament-widget-card">
+                          <div className="tournament-widget-card-header">
+                            <h3 className="tournament-widget-card-title">{tournament.name}</h3>
+                            <span className="tournament-widget-status tournament-widget-status-started">
+                              Pågår
+                            </span>
+                          </div>
+                          
+                          <div className="tournament-widget-card-info">
+                            <div className="tournament-widget-info-row">
+                              <span className="tournament-widget-info-label">📅 Datum:</span>
+                              <span className="tournament-widget-info-value">
+                                {tournament.startDate} {tournament.startTime}
+                              </span>
+                            </div>
+                            <div className="tournament-widget-info-row">
+                              <span className="tournament-widget-info-label">🎮 Format:</span>
+                              <span className="tournament-widget-info-value">{tournament.format}</span>
+                            </div>
+                            <div className="tournament-widget-info-row">
+                              <span className="tournament-widget-info-label">💰 Kostnad:</span>
+                              <span className="tournament-widget-info-value">{tournament.cost} kr</span>
+                            </div>
+                            <div className="tournament-widget-info-row">
+                              <span className="tournament-widget-info-label">👥 Deltagare:</span>
+                              <span className="tournament-widget-info-value">
+                                {FAKE_PARTICIPANTS.length} / {tournament.maxPlayers}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="tournament-widget-login-prompt">
+                            <p>Logga in för att se bracket och resultat</p>
+                            <button
+                              className="tournament-widget-register-btn"
+                              onClick={() => setIsLoginModalOpen(true)}
+                            >
+                              Logga in
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="live-section-right">
-                        <PrizeShowcase tournament={tournament} />
-                      </div>
-                    </div>
-                  </div>
+                    )}
+                  </>
                 )}
               </div>
             ))}

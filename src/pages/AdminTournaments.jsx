@@ -243,11 +243,7 @@ const AdminTournaments = () => {
       } else {
         const data = await response.json().catch(() => ({ error: 'Okänt fel' }))
         const errorMsg = data.error || 'Kunde inte starta turnering'
-        if (data.currentParticipants !== undefined) {
-          alert(`${errorMsg}\n\nNuvarande deltagare: ${data.currentParticipants}\nDu behöver minst 2 deltagare för att starta turneringen.`)
-        } else {
-          alert(errorMsg)
-        }
+        alert(errorMsg)
       }
     } catch (error) {
       alert('Kunde inte starta turnering')
@@ -300,12 +296,21 @@ const AdminTournaments = () => {
               <div key={tournament._id} className="tournament-card-admin">
                 <div className="tournament-card-header">
                   <h3>{tournament.name}</h3>
-                  <span 
-                    className="tournament-status"
-                    style={{ backgroundColor: getStatusColor(tournament.status) }}
-                  >
-                    {getStatusText(tournament.status)}
-                  </span>
+                  <div className="tournament-header-right">
+                    <button
+                      className="delete-btn-header"
+                      onClick={() => handleDelete(tournament._id)}
+                      title="Ta bort turnering"
+                    >
+                      ×
+                    </button>
+                    <span 
+                      className="tournament-status"
+                      style={{ backgroundColor: getStatusColor(tournament.status) }}
+                    >
+                      {getStatusText(tournament.status)}
+                    </span>
+                  </div>
                 </div>
                 <div className="tournament-card-info">
                   <p><strong>Datum:</strong> {tournament.startDate} {tournament.startTime}</p>
@@ -327,18 +332,10 @@ const AdminTournaments = () => {
                     <button
                       className="submit-btn"
                       onClick={() => handleStart(tournament._id)}
-                      disabled={(tournament.participants?.length || 0) < 2}
-                      title={(tournament.participants?.length || 0) < 2 ? 'Behöver minst 2 deltagare för att starta' : ''}
                     >
                       Starta
                     </button>
                   )}
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(tournament._id)}
-                  >
-                    Ta bort
-                  </button>
                 </div>
               </div>
             ))}

@@ -49,76 +49,49 @@ const PersonalMatchHighlight = ({ tournament, user, onResultSubmit }) => {
 
   if (userMatch.completed) {
     return (
-      <div className="personal-match-highlight completed">
-        <div className="personal-match-header">
-          <h3>Din match - Klar</h3>
-          <div className="match-status-badge status-completed">Klar</div>
-        </div>
-        <div className="personal-match-content">
-          <div className="opponent-info">
-            <div className="opponent-label">Motståndare:</div>
-            <div className="opponent-name">
-              {opponent ? `${opponent.firstName} ${opponent.lastName}` : 'BYE'}
-            </div>
-            <div className="table-info">Bord {tableNumber}</div>
+      <div className="personal-match-simple completed">
+        <div className="personal-match-opponent">
+          <div className="personal-match-label">Din match - Klar</div>
+          <div className="personal-match-name">
+            {opponent ? `${opponent.firstName} ${opponent.lastName}` : 'BYE'}
           </div>
-          {userMatch.result && (
-            <div className="match-result-display">
-              <div className="result-label">Resultat:</div>
-              <div className="result-score">
-                {isPlayer1 ? (
-                  <>
-                    {userMatch.result.player1Wins} - {userMatch.result.player2Wins}
-                  </>
-                ) : (
-                  <>
-                    {userMatch.result.player2Wins} - {userMatch.result.player1Wins}
-                  </>
-                )}
-              </div>
-            </div>
-          )}
+          <div className="personal-match-table">Bord {tableNumber}</div>
         </div>
+        {userMatch.result && (
+          <div className="personal-match-score">
+            {isPlayer1 ? (
+              <>{userMatch.result.player1Wins} - {userMatch.result.player2Wins}</>
+            ) : (
+              <>{userMatch.result.player2Wins} - {userMatch.result.player1Wins}</>
+            )}
+          </div>
+        )}
       </div>
     )
   }
 
   return (
-    <div className="personal-match-highlight active">
-      <div className="personal-match-header">
-        <h3>Din match</h3>
-        <div className="match-status-badge status-ongoing">Pågår</div>
+    <div className="personal-match-simple">
+      <div className="personal-match-opponent">
+        <div className="personal-match-label">Din match</div>
+        <div className="personal-match-name">
+          {opponent ? `${opponent.firstName} ${opponent.lastName}` : 'BYE'}
+        </div>
+        <div className="personal-match-table">Bord {tableNumber}</div>
       </div>
-      
-      <div className="personal-match-content">
-        <div className="opponent-section">
-          <div className="opponent-label">Motståndare</div>
-          <div className="opponent-name-large">
-            {opponent ? `${opponent.firstName} ${opponent.lastName}` : 'BYE'}
-          </div>
-          <div className="table-info-large">Bord {tableNumber}</div>
-        </div>
-
-        <div className="match-timer-section">
-          <div className="timer-label">Återstående tid</div>
-          <div className="match-timer-large">
-            {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-          </div>
-        </div>
-
-        <div className="personal-match-actions">
-          <button
-            className="submit-result-button primary large"
-            onClick={() => onResultSubmit(
-              userMatch, 
-              currentRound.roundNumber || tournament.rounds?.indexOf(currentRound) + 1,
-              currentRound.pairings.indexOf(userMatch)
-            )}
-          >
-            Skicka in resultat
-          </button>
-        </div>
+      <div className="personal-match-timer">
+        {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
       </div>
+      <button
+        className="submit-result-btn-simple"
+        onClick={() => onResultSubmit(
+          userMatch, 
+          currentRound.roundNumber || tournament.rounds?.indexOf(currentRound) + 1,
+          currentRound.pairings.indexOf(userMatch)
+        )}
+      >
+        Skicka in resultat
+      </button>
     </div>
   )
 }

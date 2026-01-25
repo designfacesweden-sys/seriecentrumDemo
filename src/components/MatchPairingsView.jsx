@@ -49,97 +49,92 @@ const MatchPairingsView = ({ tournament, user, onResultSubmit }) => {
     )
   }
 
+  const user = JSON.parse(sessionStorage.getItem('user') || 'null')
+
   return (
-    <div className="match-pairings-container">
-      <div className="pairings-header">
-        <h3>Matchparringar - Runda {currentRound.roundNumber || tournament.rounds?.indexOf(currentRound) + 1}</h3>
-        <div className="round-timer-badge">
-          <span className="timer-icon">⏱</span>
-          <span>{Math.floor(globalTimeRemaining / 60000)}:{(Math.floor((globalTimeRemaining % 60000) / 1000)).toString().padStart(2, '0')}</span>
+    <div className="match-pairings-list">
+      <div className="pairings-list-header">
+        <h2>Runda {currentRound.roundNumber || tournament.rounds?.indexOf(currentRound) + 1}</h2>
+        <div className="round-timer-display">
+          {Math.floor(globalTimeRemaining / 60000)}:{(Math.floor((globalTimeRemaining % 60000) / 1000)).toString().padStart(2, '0')}
         </div>
       </div>
 
-      <div className="match-cards-grid">
+      <div className="matches-list-table">
+        <div className="matches-list-header-row">
+          <div className="match-col-table">Bord</div>
+          <div className="match-col-players">Spelare</div>
+          <div className="match-col-score">Resultat</div>
+          <div className="match-col-action">Åtgärd</div>
+        </div>
+
         {currentRound.pairings.map((pairing, index) => {
           const matchStatus = getMatchStatus(pairing)
           const tableNumber = index + 1
           const isUserMatch = isUserInMatch(pairing)
-          const timeRemaining = globalTimeRemaining
+          const isPlayer1 = user && (
+            (pairing.player1?.userId?.toString() === user._id) ||
+            (pairing.player1?.email === user.email)
+          )
+          const isPlayer2 = user && pairing.player2 && (
+            (pairing.player2?.userId?.toString() === user._id) ||
+            (pairing.player2?.email === user.email)
+          )
 
           return (
             <div 
               key={index} 
-              className={`match-card ${matchStatus} ${isUserMatch ? 'user-match' : ''}`}
+              className={`matches-list-row ${matchStatus} ${isUserMatch ? 'user-match-row' : ''}`}
             >
-              <div className="match-card-header">
-                <div className="table-number">Bord {tableNumber}</div>
-                <div className={`match-status-badge status-${matchStatus}`}>
-                  {matchStatus === 'completed' ? 'Klar' : 
-                   matchStatus === 'awaiting' ? 'Väntar på bekräftelse' : 
-                   'Pågår'}
-                </div>
+              <div className="match-col-table">
+                <span className="table-number-badge">{tableNumber}</span>
               </div>
-
-              <div className="match-players">
-                <div className="player-info player-1">
-                  <div className="player-name">
+              
+              <div className="match-col-players">
+                <div className="player-row">
+                  <span className={`player-name ${isPlayer1 ? 'you-indicator' : ''}`}>
                     {pairing.player1?.firstName} {pairing.player1?.lastName}
-                  </div>
-                  {pairing.result && (
-                    <div className="player-score">
-                      {pairing.result.player1Wins} - {pairing.result.player2Wins}
-                    </div>
-                  )}
+                    {isPlayer1 && <span className="you-badge">(Du)</span>}
+                  </span>
                 </div>
-
-                <div className="vs-divider">VS</div>
-
-                <div className="player-info player-2">
-                  <div className="player-name">
+                <div className="player-row">
+                  <span className={`player-name ${isPlayer2 ? 'you-indicator' : ''}`}>
                     {pairing.player2 ? (
                       <>
                         {pairing.player2.firstName} {pairing.player2.lastName}
+                        {isPlayer2 && <span className="you-badge">(Du)</span>}
                       </>
                     ) : (
                       <span className="bye-indicator">BYE</span>
                     )}
-                  </div>
-                  {pairing.result && pairing.player2 && (
-                    <div className="player-score">
-                      {pairing.result.player2Wins} - {pairing.result.player1Wins}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {matchStatus !== 'completed' && !pairing.player2 && (
-                <div className="match-timer">
-                  <span className="timer-icon-small">⏱</span>
-                  <span className="timer-text">
-                    {Math.floor(timeRemaining / 60000)}:{(Math.floor((timeRemaining % 60000) / 1000)).toString().padStart(2, '0')}
                   </span>
                 </div>
-              )}
-
-              {matchStatus !== 'completed' && pairing.player2 && (
-                <div className="match-actions">
-                  {isUserMatch ? (
-                    <button
-                      className="submit-result-button primary"
-                      onClick={() => onResultSubmit(pairing, currentRound.roundNumber || tournament.rounds?.indexOf(currentRound) + 1, index)}
-                    >
-                      Skicka in resultat
-                    </button>
-                  ) : (
-                    <div className="match-timer">
-                      <span className="timer-icon-small">⏱</span>
-                      <span className="timer-text">
-                        {Math.floor(timeRemaining / 60000)}:{(Math.floor((timeRemaining % 60000) / 1000)).toString().padStart(2, '0')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
+              </div>
+              
+              <div className="match-col-score">
+                {matchStatus === 'completed' && pairing.result ? (
+                  <div className="score-display">
+                    {pairing.result.player1Wins} - {pairing.result.player2Wins}
+                  </div>
+                ) : (
+                  <div className="score-pending">-</div>
+                )}
+              </div>
+              
+              <div className="match-col-action">
+                {matchStatus !== 'completed' && pairing.player2 && (isPlayer1 || isPlayer2) ? (
+                  <button
+                    className="submit-score-btn"
+                    onClick={() => onResultSubmit(pairing, currentRound.roundNumber || tournament.rounds?.indexOf(currentRound) + 1, index)}
+                  >
+                    Skicka in
+                  </button>
+                ) : matchStatus === 'completed' ? (
+                  <span className="match-completed-badge">Klar</span>
+                ) : (
+                  <span className="match-waiting">-</span>
+                )}
+              </div>
             </div>
           )
         })}

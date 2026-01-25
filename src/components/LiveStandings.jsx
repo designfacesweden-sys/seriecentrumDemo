@@ -32,70 +32,32 @@ const LiveStandings = ({ tournament }) => {
   }
 
   return (
-    <div className="live-standings-container">
-      <div className="standings-header">
-        <h3>Ställning</h3>
-        <div className="standings-update-indicator">
-          <span className="update-dot"></span>
-          Live uppdatering
+    <div className="standings-list-clean">
+      <h2 className="standings-list-title">Ställning</h2>
+      <div className="standings-list-table">
+        <div className="standings-list-header-row">
+          <div className="standings-col-rank">#</div>
+          <div className="standings-col-name">Spelare</div>
+          <div className="standings-col-points">Poäng</div>
+          <div className="standings-col-record">W-L</div>
         </div>
-      </div>
+        {standings.map((participant, index) => {
+          const rank = index + 1
+          const wins = participant.wins || 0
+          const losses = participant.losses || 0
+          const points = participant.points || 0
 
-      <div className="standings-table-wrapper">
-        <table className="standings-table-live">
-          <thead>
-            <tr>
-              <th className="rank-col">Plats</th>
-              <th className="name-col">Spelare</th>
-              <th className="points-col">Poäng</th>
-              <th className="record-col">Match</th>
-              <th className="games-col">Spel</th>
-            </tr>
-          </thead>
-          <tbody>
-            {standings.map((participant, index) => {
-              const rank = index + 1
-              const wins = participant.wins || 0
-              const losses = participant.losses || 0
-              const draws = participant.draws || 0
-              const totalMatches = wins + losses + draws
-              const points = participant.points || 0
-
-              return (
-                <tr key={index} className={`rank-${getRankColor(rank)}`}>
-                  <td className="rank-cell">
-                    <span className="rank-number">{rank}</span>
-                    {rank <= 3 && <span className="rank-medal">🏆</span>}
-                  </td>
-                  <td className="name-cell">
-                    {participant.firstName} {participant.lastName}
-                  </td>
-                  <td className="points-cell">
-                    <strong>{points}</strong>
-                  </td>
-                  <td className="record-cell">
-                    <span className="record-wins">{wins}</span>
-                    <span className="record-separator">-</span>
-                    <span className="record-losses">{losses}</span>
-                    {draws > 0 && (
-                      <>
-                        <span className="record-separator">-</span>
-                        <span className="record-draws">{draws}</span>
-                      </>
-                    )}
-                  </td>
-                  <td className="games-cell">
-                    {totalMatches > 0 ? (
-                      <span className="games-played">{totalMatches}</span>
-                    ) : (
-                      <span className="games-pending">-</span>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+          return (
+            <div key={index} className={`standings-list-row ${rank <= 3 ? 'top-' + rank : ''}`}>
+              <div className="standings-col-rank">{rank}</div>
+              <div className="standings-col-name">
+                {participant.firstName} {participant.lastName}
+              </div>
+              <div className="standings-col-points">{points}</div>
+              <div className="standings-col-record">{wins}-{losses}</div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

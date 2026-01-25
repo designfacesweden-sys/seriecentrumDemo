@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useUser } from './UserAuth'
 import LoginModal from './LoginModal'
@@ -11,8 +11,38 @@ const Navbar = () => {
   const [accountOpen, setAccountOpen] = useState(false)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
+  const [isScrolledDown, setIsScrolledDown] = useState(false)
+  const [lastScrollY, setLastScrollY] = useState(0)
+  const accountButtonRef = useRef(null)
+  const cartButtonRef = useRef(null)
+  const accountDropdownRef = useRef(null)
+  const cartDropdownRef = useRef(null)
+  const location = useLocation()
   const { cart, removeFromCart, updateQuantity, getTotalPrice, getCartCount } = useCart()
   const { user, login, logout } = useUser()
+
+  // Handle scroll to hide/show navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      
+      // Show navbar at top of page
+      if (currentScrollY < 50) {
+        setIsScrolledDown(false)
+      } 
+      // Hide when scrolling down, show when scrolling up
+      else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsScrolledDown(true)
+      } else if (currentScrollY < lastScrollY) {
+        setIsScrolledDown(false)
+      }
+      
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lastScrollY])
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
@@ -29,12 +59,67 @@ const Navbar = () => {
   }
 
   const toggleCart = () => {
+    console.log('toggleCart called', !cartOpen)
+    // Close account if open when opening cart
+    if (accountOpen) {
+      setAccountOpen(false)
+    }
     setCartOpen(!cartOpen)
   }
 
   const closeCart = () => {
     setCartOpen(false)
   }
+
+  // Position dropdowns dynamically (desktop only)
+  useEffect(() => {
+    const updateDropdownPosition = () => {
+      // Only position dynamically on desktop (width > 768px)
+      if (window.innerWidth <= 768) {
+        // On mobile, let CSS handle positioning
+        if (accountDropdownRef.current) {
+          accountDropdownRef.current.style.top = ''
+          accountDropdownRef.current.style.right = ''
+          accountDropdownRef.current.style.bottom = ''
+          accountDropdownRef.current.style.left = ''
+        }
+        if (cartDropdownRef.current) {
+          cartDropdownRef.current.style.top = ''
+          cartDropdownRef.current.style.right = ''
+          cartDropdownRef.current.style.bottom = ''
+          cartDropdownRef.current.style.left = ''
+        }
+        return
+      }
+      
+      // Desktop positioning
+      if (accountOpen && accountButtonRef.current && accountDropdownRef.current) {
+        const buttonRect = accountButtonRef.current.getBoundingClientRect()
+        accountDropdownRef.current.style.top = `${buttonRect.bottom + 8}px`
+        accountDropdownRef.current.style.right = `${window.innerWidth - buttonRect.right}px`
+        accountDropdownRef.current.style.bottom = ''
+        accountDropdownRef.current.style.left = ''
+      }
+      if (cartOpen && cartButtonRef.current && cartDropdownRef.current) {
+        const buttonRect = cartButtonRef.current.getBoundingClientRect()
+        cartDropdownRef.current.style.top = `${buttonRect.bottom + 8}px`
+        cartDropdownRef.current.style.right = `${window.innerWidth - buttonRect.right}px`
+        cartDropdownRef.current.style.bottom = ''
+        cartDropdownRef.current.style.left = ''
+      }
+    }
+    
+    if (accountOpen || cartOpen) {
+      updateDropdownPosition()
+      window.addEventListener('resize', updateDropdownPosition)
+      window.addEventListener('scroll', updateDropdownPosition, true)
+    }
+    
+    return () => {
+      window.removeEventListener('resize', updateDropdownPosition)
+      window.removeEventListener('scroll', updateDropdownPosition, true)
+    }
+  }, [accountOpen, cartOpen])
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -61,6 +146,11 @@ const Navbar = () => {
   }, [cartOpen, accountOpen])
 
   const toggleAccount = () => {
+    console.log('toggleAccount called', !accountOpen)
+    // Close cart if open when opening account
+    if (cartOpen) {
+      setCartOpen(false)
+    }
     setAccountOpen(!accountOpen)
   }
 
@@ -73,11 +163,18 @@ const Navbar = () => {
     setAccountOpen(false)
   }
 
+  // Close cart when navigating to checkout
+  useEffect(() => {
+    if (location.pathname === '/checkout') {
+      setCartOpen(false)
+    }
+  }, [location.pathname])
+
   const totalPrice = getTotalPrice()
   const cartCount = getCartCount()
 
   return (
-    <header className="header">
+    <header className={`header ${isScrolledDown ? 'scrolled-down' : ''}`}>
       <div className="container">
         <div className="header-content">
           <div className="logo-section">
@@ -108,16 +205,20 @@ const Navbar = () => {
           </div>
           <div className={`account-wrapper ${accountOpen ? 'active' : ''}`}>
             <button 
+              ref={accountButtonRef}
               className="account-icon-btn" 
               aria-label="Konto"
-              onClick={toggleAccount}
+              onClick={(e) => {
+                e.stopPropagation()
+                toggleAccount()
+              }}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </button>
-            <div className="account-dropdown">
+            <div ref={accountDropdownRef} className="account-dropdown">
               {user ? (
                 <>
                   <div className="account-dropdown-header">
@@ -158,10 +259,14 @@ const Navbar = () => {
           </div>
           <div className={`cart-wrapper ${cartOpen ? 'active' : ''}`}>
             <button 
+              ref={cartButtonRef}
               className="cart-icon-btn" 
               id="cart-toggle" 
               aria-label="Visa varukorg"
-              onClick={toggleCart}
+              onClick={(e) => {
+                e.stopPropagation()
+                toggleCart()
+              }}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
@@ -170,7 +275,7 @@ const Navbar = () => {
               </svg>
               {cartCount > 0 && <span className="cart-count" id="cart-count">{cartCount}</span>}
             </button>
-            <div className="cart-dropdown" id="cart-dropdown">
+            <div ref={cartDropdownRef} className="cart-dropdown" id="cart-dropdown">
               <div className="cart-dropdown-header">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                   <h3>Varukorg</h3>
@@ -233,6 +338,9 @@ const Navbar = () => {
                   onClick={(e) => {
                     if (cart.length === 0) {
                       e.preventDefault()
+                    } else {
+                      // Close cart when navigating to checkout
+                      setCartOpen(false)
                     }
                   }}
                 >
